@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Sistem Pendaftaran Klinik Gigi
 
-## Getting Started
+Aplikasi berbasis web untuk manajemen jadwal konsultasi klinik gigi. Sistem memfasilitasi pasien untuk mendaftar secara online tanpa login, dan memungkinkan admin untuk mengelola jadwal serta mengonfirmasi kedatangan pasien via tautan WhatsApp unik.
 
-First, run the development server:
+## Spesifikasi Teknologi
+* **Kerangka Kerja Utama:** Next.js (App Router)
+* **Antarmuka:** Tailwind CSS
+* **Basis Data:** PostgreSQL (Library `pg`)
+* **Lingkungan Produksi:** Vercel (Tautan Utama: `https://klinikhetty.myon.my.id`)
+
+## Panduan Instalasi Lokal
+
+### 1. Kloning Repositori & Instalasi
+Pastikan Node.js dan Git sudah terinstal di perangkat masing-masing, lalu jalankan perintah berikut di terminal:
+
+```bash
+git clone [MASUKKAN_LINK_GITHUB_DI_SINI]
+cd web-klinik-gigi
+npm install
+```
+
+### 2. Konfigurasi Lingkungan (Environment)
+
+Buat file bernama `.env.local` di *root directory* proyek (sejajar dengan `package.json`), lalu masukkan kredensial PostgreSQL lokal masing-masing:
+
+```env
+DATABASE_URL=postgresql://postgres:password_pgadmin_kalian@localhost:5432/nama_database_kalian
+```
+
+### 3. Migrasi Basis Data
+
+Buat database baru di pgAdmin 4, buka Query Tool, dan jalankan skema berikut untuk membangun struktur tabel yang dibutuhkan sistem:
+
+```sql
+CREATE TYPE status_jadwal AS ENUM ('PENDING', 'MENUNGGU_KONFIRMASI', 'TERKONFIRMASI', 'SELESAI');
+
+CREATE TABLE admin (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE appointments (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY, 
+    nama VARCHAR(255) NOT NULL,
+    nomor_hp VARCHAR(20) NOT NULL,
+    tempat_lahir VARCHAR(100) NOT NULL,
+    tanggal_lahir DATE NOT NULL,
+    alamat TEXT NOT NULL,
+    keluhan TEXT NOT NULL,
+    tanggal_jadwal DATE,
+    waktu_jadwal TIME,
+    status status_jadwal DEFAULT 'PENDING',
+    sumber_daftar VARCHAR(50) DEFAULT 'WEBSITE',
+    tindakan TEXT,
+    biaya INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### 4. Menjalankan Server Pengembangan
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Buka `http://localhost:3000` di peramban untuk melihat hasil perubahan kode. Pastikan untuk selalu membuat branch baru saat mengembangkan fitur terpisah guna menghindari konflik saat penggabungan (merge) ke cabang utama.
