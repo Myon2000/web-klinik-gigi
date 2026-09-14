@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 
 // Komponen Modular Pasien
 import ClinicHeader from "@/components/patient/ClinicHeader";
@@ -110,16 +109,8 @@ export default function Home() {
 
       {/* 3. Footer */}
       <footer className="bg-white border-t border-slate-200 py-6 mt-12">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Klinik Gigi Dokter. Seluruh hak cipta dilindungi.</p>
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/admin/login" 
-              className="text-slate-400 hover:text-blue-600 transition-colors flex items-center gap-1 font-medium"
-            >
-              <span>Akses Khusus Admin & Dokter</span>
-            </Link>
-          </div>
         </div>
       </footer>
 

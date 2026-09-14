@@ -97,18 +97,10 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-500">
-              <span className="font-semibold text-slate-700">Akun Bawaan PKL:</span>
-              <div className="mt-0.5 flex items-center justify-between text-slate-600">
-                <span>User: <code className="bg-slate-200 px-1 py-0.5 rounded">admin</code></span>
-                <span>Pass: <code className="bg-slate-200 px-1 py-0.5 rounded">admin123</code></span>
-              </div>
-            </div>
-
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-md shadow-blue-200 transition-all cursor-pointer disabled:opacity-50 mt-2"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-md shadow-blue-200 transition-all cursor-pointer disabled:opacity-50 mt-4"
             >
               {loading ? (
                 <>
