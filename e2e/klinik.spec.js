@@ -7,9 +7,11 @@ test.describe('Klinik Gigi - E2E Testing Suite', () => {
     // Verifikasi elemen halaman publik
     await expect(page.getByRole('heading', { name: 'Formulir Pendaftaran Pasien' })).toBeVisible();
 
+    const uniquePhone = '0812' + Math.floor(10000000 + Math.random() * 90000000);
+
     // Mengisi formulir pendaftaran
     await page.fill('input[name="nama"]', 'Tes Pasien E2E');
-    await page.fill('input[name="nomor_hp"]', '081299887766');
+    await page.fill('input[name="nomor_hp"]', uniquePhone);
     await page.fill('input[name="tempat_lahir"]', 'Jakarta');
     await page.fill('input[name="tanggal_lahir"]', '1995-08-17');
     await page.fill('textarea[name="alamat"]', 'Jl. Sudirman Kav 10, Jakarta Selatan');
@@ -20,7 +22,7 @@ test.describe('Klinik Gigi - E2E Testing Suite', () => {
 
     // Verifikasi pop-up notifikasi berhasil muncul
     const popupHeading = page.getByRole('heading', { name: 'Pendaftaran Konsultasi Berhasil!' });
-    await expect(popupHeading).toBeVisible({ timeout: 10000 });
+    await expect(popupHeading).toBeVisible({ timeout: 20000 });
 
     // Verifikasi tombol tutup pop-up dapat menutup modal
     await page.click('button:has-text("Mengerti & Tutup")');

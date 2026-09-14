@@ -16,7 +16,7 @@ export default function RealtimeToast({ toast, onClose }) {
           <span className="text-[10px] text-slate-400">{toast.waktu} WIB</span>
         </div>
         <p className="font-semibold text-white mt-1 text-sm">{toast.nama}</p>
-        <p className="text-slate-300 line-clamp-1 italic mt-0.5">"{toast.keluhan}"</p>
+        <p className="text-slate-300 line-clamp-1 italic mt-0.5">&ldquo;{toast.keluhan}&rdquo;</p>
       </div>
       <button
         onClick={onClose}

@@ -38,11 +38,6 @@ export async function GET(request) {
       orderBy: { createdAt: 'asc' },
     });
 
-    const monthNames = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-    ];
-
     const formatDate = (date) => {
       if (!date) return '-';
       const d = new Date(date);

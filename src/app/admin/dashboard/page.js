@@ -168,16 +168,25 @@ export default function AdminDashboard() {
 
   // Background auto-sync sebagai fallback berkala
   useEffect(() => {
-    fetchAppointments();
-    fetchUnreadCount();
-    fetchClinicSettings();
+    let isMounted = true;
+    const loadData = async () => {
+      if (isMounted) {
+        await Promise.all([fetchAppointments(), fetchUnreadCount(), fetchClinicSettings()]);
+      }
+    };
+    loadData();
 
     const interval = setInterval(() => {
-      fetchAppointments();
-      fetchUnreadCount();
+      if (isMounted) {
+        fetchAppointments();
+        fetchUnreadCount();
+      }
     }, 8000);
 
-    return () => clearInterval(interval);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, [fetchAppointments, fetchUnreadCount, fetchClinicSettings]);
 
   // Logout Handler

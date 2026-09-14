@@ -5,22 +5,26 @@ import { Send, X } from "lucide-react";
 import { buildWhatsAppLink } from "@/lib/formatters";
 
 export default function ScheduleModal({ open, appointment, onClose, onSuccess, setFeedback }) {
-  const [scheduleData, setScheduleData] = useState({ tanggalJanji: "", jamJanji: "16:00" });
+  const today = new Date().toISOString().split("T")[0];
+  const [scheduleData, setScheduleData] = useState({
+    tanggalJanji: appointment?.tanggalJanji
+      ? new Date(appointment.tanggalJanji).toISOString().split("T")[0]
+      : today,
+    jamJanji: appointment?.jamJanji || "16:00",
+  });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (appointment) {
-      const today = new Date().toISOString().split("T")[0];
-      const initialDate = appointment.tanggalJanji
+  // Update scheduleData when appointment id changes
+  const [prevId, setPrevId] = useState(appointment?.id);
+  if (appointment && appointment.id !== prevId) {
+    setPrevId(appointment.id);
+    setScheduleData({
+      tanggalJanji: appointment.tanggalJanji
         ? new Date(appointment.tanggalJanji).toISOString().split("T")[0]
-        : today;
-
-      setScheduleData({
-        tanggalJanji: initialDate,
-        jamJanji: appointment.jamJanji || "16:00",
-      });
-    }
-  }, [appointment]);
+        : today,
+      jamJanji: appointment.jamJanji || "16:00",
+    });
+  }
 
   if (!open || !appointment) return null;
 
@@ -86,7 +90,7 @@ export default function ScheduleModal({ open, appointment, onClose, onSuccess, s
           <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
             <p className="font-semibold text-slate-800 text-sm">{appointment.nama}</p>
             <p className="text-slate-500 mt-0.5">WhatsApp: {appointment.nomorHp}</p>
-            <p className="text-slate-600 italic mt-1">"{appointment.keluhan}"</p>
+            <p className="text-slate-600 italic mt-1">&ldquo;{appointment.keluhan}&rdquo;</p>
           </div>
 
           <div>

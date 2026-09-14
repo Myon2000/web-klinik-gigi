@@ -8,13 +8,13 @@ import {
   Clock, 
   CheckCircle2, 
   AlertCircle, 
-  Calendar, 
   User, 
   FileText, 
   ArrowLeft,
   Stethoscope,
   MessageCircle
 } from "lucide-react";
+import { formatTanggal } from "@/lib/formatters";
 
 export default function KonfirmasiJadwalPage() {
   const params = useParams();
@@ -75,17 +75,6 @@ export default function KonfirmasiJadwalPage() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const formatTanggal = (dateStr) => {
-    if (!dateStr) return "-";
-    const d = new Date(dateStr);
-    return d.toLocaleDateString("id-ID", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
   };
 
   if (loading) {
@@ -191,7 +180,7 @@ export default function KonfirmasiJadwalPage() {
               <div>
                 <p className="text-xs text-slate-500 font-medium">Hari & Tanggal</p>
                 <p className="font-semibold text-slate-900">
-                  {formatTanggal(appointment.tanggalJanji)}
+                  {formatTanggal(appointment.tanggalJanji, true)}
                 </p>
               </div>
             </div>
@@ -210,7 +199,7 @@ export default function KonfirmasiJadwalPage() {
               <FileText className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
               <div>
                 <p className="text-xs text-slate-500 font-medium">Keluhan Anda</p>
-                <p className="text-xs text-slate-700 mt-0.5 italic">"{appointment.keluhan}"</p>
+                <p className="text-xs text-slate-700 mt-0.5 italic">&ldquo;{appointment.keluhan}&rdquo;</p>
               </div>
             </div>
           </div>

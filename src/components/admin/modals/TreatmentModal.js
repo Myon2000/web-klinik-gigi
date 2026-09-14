@@ -4,17 +4,21 @@ import { useState, useEffect } from "react";
 import { Stethoscope, X } from "lucide-react";
 
 export default function TreatmentModal({ open, appointment, onClose, onSuccess, setFeedback }) {
-  const [treatmentData, setTreatmentData] = useState({ tindakan: "", biaya: "" });
+  const [treatmentData, setTreatmentData] = useState({
+    tindakan: appointment?.tindakan || "",
+    biaya: appointment?.biaya ? appointment.biaya.toString() : "",
+  });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (appointment) {
-      setTreatmentData({
-        tindakan: appointment.tindakan || "",
-        biaya: appointment.biaya ? appointment.biaya.toString() : "",
-      });
-    }
-  }, [appointment]);
+  // Update treatmentData when appointment id changes
+  const [prevId, setPrevId] = useState(appointment?.id);
+  if (appointment && appointment.id !== prevId) {
+    setPrevId(appointment.id);
+    setTreatmentData({
+      tindakan: appointment.tindakan || "",
+      biaya: appointment.biaya ? appointment.biaya.toString() : "",
+    });
+  }
 
   if (!open || !appointment) return null;
 
@@ -67,7 +71,7 @@ export default function TreatmentModal({ open, appointment, onClose, onSuccess, 
         <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
           <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
             <p className="font-semibold text-slate-800 text-sm">{appointment.nama}</p>
-            <p className="text-slate-500 mt-0.5">Keluhan awal: "{appointment.keluhan}"</p>
+            <p className="text-slate-500 mt-0.5">Keluhan awal: &ldquo;{appointment.keluhan}&rdquo;</p>
           </div>
 
           <div>

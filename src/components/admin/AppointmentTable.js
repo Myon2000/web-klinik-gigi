@@ -114,7 +114,7 @@ export default function AppointmentTable({
 
                   {/* Keluhan & Alamat */}
                   <td className="py-3.5 px-4 align-top max-w-xs">
-                    <p className="text-slate-800 font-medium line-clamp-2">"{item.keluhan}"</p>
+                    <p className="text-slate-800 font-medium line-clamp-2">&ldquo;{item.keluhan}&rdquo;</p>
                     <p className="text-[11px] text-slate-500 flex items-start gap-1 mt-1">
                       <MapPin className="w-3 h-3 text-slate-400 shrink-0 mt-0.5" />
                       <span className="line-clamp-2">{item.alamat}</span>

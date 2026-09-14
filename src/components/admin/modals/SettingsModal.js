@@ -4,14 +4,15 @@ import { useState, useEffect } from "react";
 import { Settings, X } from "lucide-react";
 
 export default function SettingsModal({ open, clinicSettings, setClinicSettings, onClose, setFeedback }) {
-  const [localSettings, setLocalSettings] = useState({ isOpen: true, announcement: "" });
+  const [localSettings, setLocalSettings] = useState(() => clinicSettings || { isOpen: true, announcement: "" });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (clinicSettings) {
-      setLocalSettings(clinicSettings);
-    }
-  }, [clinicSettings]);
+  // Sync if clinicSettings changes
+  const [prevSettings, setPrevSettings] = useState(clinicSettings);
+  if (clinicSettings && clinicSettings !== prevSettings) {
+    setPrevSettings(clinicSettings);
+    setLocalSettings(clinicSettings);
+  }
 
   if (!open) return null;
 
