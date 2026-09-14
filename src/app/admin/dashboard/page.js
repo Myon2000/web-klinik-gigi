@@ -7,6 +7,7 @@ import { CheckCircle2, AlertCircle, X } from "lucide-react";
 // Komponen Modular Admin
 import HeaderNav from "@/components/admin/HeaderNav";
 import StatsGrid from "@/components/admin/StatsGrid";
+import AnalyticsSection from "@/components/admin/AnalyticsSection";
 import FilterBar from "@/components/admin/FilterBar";
 import AppointmentTable from "@/components/admin/AppointmentTable";
 import RealtimeToast from "@/components/admin/RealtimeToast";
@@ -17,6 +18,7 @@ import TreatmentModal from "@/components/admin/modals/TreatmentModal";
 import ManualPatientModal from "@/components/admin/modals/ManualPatientModal";
 import ExportModal from "@/components/admin/modals/ExportModal";
 import SettingsModal from "@/components/admin/modals/SettingsModal";
+import ReceiptModal from "@/components/admin/modals/ReceiptModal";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -35,6 +37,7 @@ export default function AdminDashboard() {
   const [manualModal, setManualModal] = useState(false);
   const [exportModal, setExportModal] = useState(false);
   const [settingsModal, setSettingsModal] = useState(false);
+  const [receiptModal, setReceiptModal] = useState({ open: false, appointment: null });
 
   // Status & Notifikasi Realtime
   const [feedback, setFeedback] = useState({ message: "", type: "" });
@@ -263,7 +266,10 @@ export default function AdminDashboard() {
           setStatusFilter={setStatusFilter}
         />
 
-        {/* 4. Filter Status & Kolom Pencarian */}
+        {/* 4. Analitik & Grafik Tren Keluhan Pasien serta Tindakan Medis */}
+        <AnalyticsSection appointments={appointments} />
+
+        {/* 5. Filter Status & Kolom Pencarian */}
         <FilterBar
           totalCount={appointments.length}
           menungguJadwalCount={stats.menungguJadwal}
@@ -273,16 +279,17 @@ export default function AdminDashboard() {
           setSearchQuery={setSearchQuery}
         />
 
-        {/* 5. Tabel Daftar Jadwal & Tindakan */}
+        {/* 6. Tabel Daftar Jadwal & Tindakan */}
         <AppointmentTable
           appointments={filteredAppointments}
           loading={loading}
           onOpenScheduleModal={(item) => setScheduleModal({ open: true, appointment: item })}
           onOpenTreatmentModal={(item) => setTreatmentModal({ open: true, appointment: item })}
+          onOpenReceiptModal={(item) => setReceiptModal({ open: true, appointment: item })}
         />
       </main>
 
-      {/* 6. Modal Dialogs */}
+      {/* 7. Modal Dialogs */}
       <ScheduleModal
         open={scheduleModal.open}
         appointment={scheduleModal.appointment}
@@ -320,6 +327,12 @@ export default function AdminDashboard() {
         setClinicSettings={setClinicSettings}
         onClose={() => setSettingsModal(false)}
         setFeedback={setFeedback}
+      />
+
+      <ReceiptModal
+        open={receiptModal.open}
+        appointment={receiptModal.appointment}
+        onClose={() => setReceiptModal({ open: false, appointment: null })}
       />
 
       {/* 7. Floating Realtime Notification Toast */}

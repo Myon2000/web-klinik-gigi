@@ -1,6 +1,6 @@
 "use client";
 
-import { Phone, MapPin, Clock, Send, Stethoscope, Check, FileText } from "lucide-react";
+import { Phone, MapPin, Clock, Send, Stethoscope, Check, FileText, Printer } from "lucide-react";
 import { formatTanggal, formatRupiah } from "@/lib/formatters";
 
 export default function AppointmentTable({
@@ -8,6 +8,7 @@ export default function AppointmentTable({
   loading,
   onOpenScheduleModal,
   onOpenTreatmentModal,
+  onOpenReceiptModal,
 }) {
   const getStatusBadge = (status) => {
     switch (status) {
@@ -146,6 +147,11 @@ export default function AppointmentTable({
                     {item.tindakan ? (
                       <div>
                         <p className="font-medium text-slate-800 line-clamp-2">{item.tindakan}</p>
+                        {item.catatanDokter && (
+                          <p className="text-[10px] text-blue-600 line-clamp-1 italic mt-0.5">
+                            * {item.catatanDokter}
+                          </p>
+                        )}
                         <p className="font-bold text-emerald-700 mt-0.5">{formatRupiah(item.biaya)}</p>
                       </div>
                     ) : (
@@ -173,6 +179,17 @@ export default function AppointmentTable({
                         <Stethoscope className="w-3 h-3" />
                         <span>Tindakan</span>
                       </button>
+
+                      {item.status === "SELESAI" && (
+                        <button
+                          onClick={() => onOpenReceiptModal(item)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold border border-slate-300 transition-colors cursor-pointer text-xs"
+                          title="Cetak Bukti Kunjungan / Nota Pembayaran"
+                        >
+                          <Printer className="w-3 h-3 text-slate-500" />
+                          <span>Nota</span>
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

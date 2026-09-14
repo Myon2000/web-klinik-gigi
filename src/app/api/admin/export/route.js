@@ -57,6 +57,7 @@ export async function GET(request) {
       'Jam Janji': item.jamJanji || '-',
       Status: item.status,
       'Tindakan Dokter Gigi': item.tindakan || '-',
+      'Catatan Khusus Dokter': item.catatanDokter || '-',
       'Biaya (Rp)': item.biaya ? Number(item.biaya) : 0,
     }));
 
@@ -76,6 +77,7 @@ export async function GET(request) {
       { wch: 12 }, // Jam Janji
       { wch: 20 }, // Status
       { wch: 30 }, // Tindakan
+      { wch: 35 }, // Catatan Khusus Dokter
       { wch: 15 }, // Biaya
     ];
 

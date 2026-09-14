@@ -41,6 +41,7 @@ model Appointment {
   jamJanji     String?           @map("jam_janji")
   status       AppointmentStatus @default(MENUNGGU_JADWAL)
   tindakan     String?
+  catatanDokter String?          @map("catatan_dokter")
   biaya        Decimal?          @db.Decimal(12, 2)
   sumber       String            @default("WEB") // "WEB" atau "MANUAL"
   isRead       Boolean           @default(false) @map("is_read")

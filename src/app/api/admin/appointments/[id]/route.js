@@ -30,6 +30,9 @@ export async function PATCH(request, context) {
     if (body.tindakan !== undefined) {
       updateData.tindakan = body.tindakan;
     }
+    if (body.catatanDokter !== undefined) {
+      updateData.catatanDokter = body.catatanDokter;
+    }
     if (body.biaya !== undefined) {
       updateData.biaya = body.biaya !== null && body.biaya !== '' ? parseFloat(body.biaya) : null;
     }

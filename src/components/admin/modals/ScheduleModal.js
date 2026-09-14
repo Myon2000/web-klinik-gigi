@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Send, X } from "lucide-react";
-import { buildWhatsAppLink } from "@/lib/formatters";
+import { useState } from "react";
+import { Send, X, MessageSquare, Sparkles } from "lucide-react";
+import { buildWhatsAppLink, getWhatsAppTemplates } from "@/lib/formatters";
 
 export default function ScheduleModal({ open, appointment, onClose, onSuccess, setFeedback }) {
   const today = new Date().toISOString().split("T")[0];
@@ -12,21 +12,73 @@ export default function ScheduleModal({ open, appointment, onClose, onSuccess, s
       : today,
     jamJanji: appointment?.jamJanji || "16:00",
   });
+
+  const [selectedTemplate, setSelectedTemplate] = useState("konfirmasi");
+  const [customMessage, setCustomMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Update scheduleData when appointment id changes
+  // Update scheduleData saat id appointment berubah
   const [prevId, setPrevId] = useState(appointment?.id);
   if (appointment && appointment.id !== prevId) {
+    const initialDate = appointment.tanggalJanji
+      ? new Date(appointment.tanggalJanji).toISOString().split("T")[0]
+      : today;
+    const initialTime = appointment.jamJanji || "16:00";
+
     setPrevId(appointment.id);
+    setSelectedTemplate("konfirmasi");
     setScheduleData({
-      tanggalJanji: appointment.tanggalJanji
-        ? new Date(appointment.tanggalJanji).toISOString().split("T")[0]
-        : today,
-      jamJanji: appointment.jamJanji || "16:00",
+      tanggalJanji: initialDate,
+      jamJanji: initialTime,
     });
+
+    const initialTemplates = getWhatsAppTemplates({
+      nama: appointment.nama,
+      tanggalJanji: initialDate,
+      jamJanji: initialTime,
+      token: appointment.token,
+      origin: typeof window !== "undefined" ? window.location.origin : "",
+    });
+    setCustomMessage(initialTemplates[0]?.text || "");
   }
 
   if (!open || !appointment) return null;
+
+  // Daftar template yang selalu terbarui dengan tanggal & jam terkini
+  const templates = getWhatsAppTemplates({
+    nama: appointment.nama,
+    tanggalJanji: scheduleData.tanggalJanji,
+    jamJanji: scheduleData.jamJanji,
+    token: appointment.token,
+    origin: typeof window !== "undefined" ? window.location.origin : "",
+  });
+
+  const handleTemplateChange = (e) => {
+    const tId = e.target.value;
+    setSelectedTemplate(tId);
+    const chosen = templates.find((t) => t.id === tId);
+    if (chosen) {
+      setCustomMessage(chosen.text);
+    }
+  };
+
+  const handleDateOrTimeChange = (field, value) => {
+    const updated = { ...scheduleData, [field]: value };
+    setScheduleData(updated);
+
+    // Refresh template message dengan tanggal/jam baru
+    const refreshedTemplates = getWhatsAppTemplates({
+      nama: appointment.nama,
+      tanggalJanji: updated.tanggalJanji,
+      jamJanji: updated.jamJanji,
+      token: appointment.token,
+      origin: window.location.origin,
+    });
+    const chosen = refreshedTemplates.find((t) => t.id === selectedTemplate);
+    if (chosen) {
+      setCustomMessage(chosen.text);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,7 +100,7 @@ export default function ScheduleModal({ open, appointment, onClose, onSuccess, s
 
       const json = await res.json();
       if (res.ok && json.success) {
-        // Buat link WA dan buka di tab baru
+        // Buat link WA dengan teks pesan yang sudah disesuaikan
         const waUrl = buildWhatsAppLink({
           nama,
           nomorHp,
@@ -56,6 +108,7 @@ export default function ScheduleModal({ open, appointment, onClose, onSuccess, s
           jamJanji: scheduleData.jamJanji,
           token,
           origin: window.location.origin,
+          customMessage: customMessage || undefined,
         });
 
         window.open(waUrl, "_blank");
@@ -75,58 +128,88 @@ export default function ScheduleModal({ open, appointment, onClose, onSuccess, s
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        <div className="bg-emerald-600 px-6 py-4 text-white flex items-center justify-between">
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-lg w-full overflow-hidden max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
+        <div className="bg-emerald-600 px-6 py-4 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <Send className="w-5 h-5" />
-            <h3 className="font-bold text-sm">Atur Jadwal & Kirim Link WA</h3>
+            <h3 className="font-bold text-sm">Atur Jadwal & Kirim Pesan WhatsApp</h3>
           </div>
           <button onClick={onClose} className="text-emerald-100 hover:text-white cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs overflow-y-auto grow">
           <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
             <p className="font-semibold text-slate-800 text-sm">{appointment.nama}</p>
             <p className="text-slate-500 mt-0.5">WhatsApp: {appointment.nomorHp}</p>
             <p className="text-slate-600 italic mt-1">&ldquo;{appointment.keluhan}&rdquo;</p>
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                Tanggal Konsultasi <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="date"
+                required
+                value={scheduleData.tanggalJanji}
+                onChange={(e) => handleDateOrTimeChange("tanggalJanji", e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                Jam Konsultasi <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="time"
+                required
+                value={scheduleData.jamJanji}
+                onChange={(e) => handleDateOrTimeChange("jamJanji", e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Pilihan Template WhatsApp */}
           <div>
-            <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1">
-              Pilih Tanggal Konsultasi <span className="text-rose-500">*</span>
+            <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1 flex items-center justify-between">
+              <span>Pilihan Template Pesan WA</span>
+              <span className="text-[10px] text-emerald-700 font-normal flex items-center gap-1">
+                <Sparkles className="w-3 h-3" /> Siap Kirim
+              </span>
             </label>
-            <input
-              type="date"
-              required
-              value={scheduleData.tanggalJanji}
-              onChange={(e) => setScheduleData({ ...scheduleData, tanggalJanji: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            <select
+              value={selectedTemplate}
+              onChange={handleTemplateChange}
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-slate-50/50 font-medium"
+            >
+              {templates.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Pratinjau & Edit Pesan Teks WhatsApp */}
+          <div>
+            <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1 flex items-center gap-1">
+              <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
+              <span>Pratinjau Isi Pesan (Dapat Diedit Bebas)</span>
+            </label>
+            <textarea
+              rows={6}
+              value={customMessage}
+              onChange={(e) => setCustomMessage(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-slate-900 font-mono text-[11px] leading-relaxed focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none bg-emerald-50/20"
             />
           </div>
 
-          <div>
-            <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1">
-              Pilih Jam Janji Temu <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="time"
-              required
-              value={scheduleData.jamJanji}
-              onChange={(e) => setScheduleData({ ...scheduleData, jamJanji: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-emerald-800 text-[11px]">
-            <p className="font-semibold">Mekanisme Pengiriman:</p>
-            <p className="mt-0.5">
-              Menekan tombol di bawah akan otomatis menyimpan jadwal ke sistem, mengubah status menjadi <strong>Menunggu Konfirmasi</strong>, dan membuka WhatsApp Web/Aplikasi dengan teks konfirmasi & link unik kehadiran pasien.
-            </p>
-          </div>
-
-          <div className="flex items-center justify-end gap-2 pt-2">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
