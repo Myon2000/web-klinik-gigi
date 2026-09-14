@@ -19,3 +19,9 @@ For UI, copy, people, mobile layout, or code comments work, load the antislop sk
 - Code comments: `antislop-code`
 Before starting, ask the user when antislop applies: during the work, or after it is done.
 <!-- antislop:end -->
+
+## Project Agent Workflow Rules (Strict)
+1. **Branch Isolation:** ALWAYS create and work inside a new dedicated branch (e.g. `feat/feature-name`, `fix/bug-name`, `refactor/scope`). NEVER commit or write code directly on `main`.
+2. **Merge Confirmation:** NEVER merge any branch into `main` autonomously. Only merge when the user explicitly instructs to do so.
+3. **Branch Retention:** NEVER delete local or remote branches after merging unless explicitly instructed. Keep all branch history intact for PKL documentation.
+4. **Clean Code & Dead Code Hygiene:** Always detect and remove dead code, unused files, unused variables, and unused imports. Always verify that `npm run lint` and `npm run build` pass cleanly before completing tasks.
