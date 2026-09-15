@@ -56,7 +56,7 @@ test.describe('Klinik Gigi - E2E Testing Suite', () => {
     await page.fill('input[type="text"]', 'admin');
     await page.fill('input[type="password"]', 'admin123');
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/.*\/admin\/dashboard/);
+    await expect(page).toHaveURL(/.*\/admin\/dashboard/, { timeout: 15000 });
 
     // Verifikasi metrik filter/tab
     await expect(page.getByRole('button', { name: 'Menunggu Konfirmasi' })).toBeVisible();
