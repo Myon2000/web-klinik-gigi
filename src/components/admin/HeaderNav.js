@@ -1,10 +1,12 @@
 "use client";
 
-import { Stethoscope, Plus, Download, Settings, LogOut } from "lucide-react";
+import { Stethoscope, Plus, Download, Settings, LogOut, Volume2, VolumeX } from "lucide-react";
 
 export default function HeaderNav({
   unreadCount,
   isConnected,
+  soundEnabled = true,
+  onToggleSound,
   onOpenManualModal,
   onOpenExportModal,
   onOpenSettingsModal,
@@ -56,6 +58,22 @@ export default function HeaderNav({
           >
             <Download className="w-3.5 h-3.5 text-slate-500" />
             <span className="hidden sm:inline">Ekspor Excel</span>
+          </button>
+
+          <button
+            onClick={onToggleSound}
+            className={`p-2 rounded-lg border transition-colors cursor-pointer ${
+              soundEnabled
+                ? "bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+                : "bg-amber-50 border-amber-300 text-amber-700 hover:bg-amber-100"
+            }`}
+            title={soundEnabled ? "Suara Notifikasi: Aktif (Klik untuk membisukan)" : "Suara Notifikasi: Dibisukan / Mute (Klik untuk mengaktifkan)"}
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-4 h-4 text-slate-600" />
+            ) : (
+              <VolumeX className="w-4 h-4 text-amber-600" />
+            )}
           </button>
 
           <button

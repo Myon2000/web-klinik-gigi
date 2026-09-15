@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, AlertCircle, X } from "lucide-react";
 
@@ -19,6 +19,7 @@ import ManualPatientModal from "@/components/admin/modals/ManualPatientModal";
 import ExportModal from "@/components/admin/modals/ExportModal";
 import SettingsModal from "@/components/admin/modals/SettingsModal";
 import ReceiptModal from "@/components/admin/modals/ReceiptModal";
+import PatientDetailModal from "@/components/admin/modals/PatientDetailModal";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -38,14 +39,22 @@ export default function AdminDashboard() {
   const [exportModal, setExportModal] = useState(false);
   const [settingsModal, setSettingsModal] = useState(false);
   const [receiptModal, setReceiptModal] = useState({ open: false, appointment: null });
+  const [patientDetailModal, setPatientDetailModal] = useState({ open: false, appointment: null });
 
   // Status & Notifikasi Realtime
   const [feedback, setFeedback] = useState({ message: "", type: "" });
   const [isConnected, setIsConnected] = useState(false);
   const [realtimeToast, setRealtimeToast] = useState(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const soundEnabledRef = useRef(soundEnabled);
+
+  useEffect(() => {
+    soundEnabledRef.current = soundEnabled;
+  }, [soundEnabled]);
 
   // Audio Chime untuk notifikasi pendaftaran baru
-  const playNotificationSound = () => {
+  const playNotificationSound = useCallback(() => {
+    if (!soundEnabledRef.current) return;
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = audioCtx.createOscillator();
@@ -60,7 +69,7 @@ export default function AdminDashboard() {
       osc.start();
       osc.stop(audioCtx.currentTime + 0.4);
     } catch {}
-  };
+  }, []);
 
   // 1. Fetch appointments
   const fetchAppointments = useCallback(async () => {
@@ -159,7 +168,7 @@ export default function AdminDashboard() {
       if (eventSource) eventSource.close();
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
     };
-  }, [fetchAppointments, fetchUnreadCount]);
+  }, [fetchAppointments, fetchUnreadCount, playNotificationSound]);
 
   // Auto-dismiss realtime toast setelah 8 detik
   useEffect(() => {
@@ -203,6 +212,31 @@ export default function AdminDashboard() {
     }
   };
 
+  // Handler Batalkan Jadwal Pasien
+  const handleCancelAppointment = async (item) => {
+    const confirmed = window.confirm(`Apakah Anda yakin ingin menandai antrean pasien "${item.nama}" sebagai BATAL?`);
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/admin/appointments/${item.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "BATAL", isRead: true }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        fetchAppointments();
+        fetchUnreadCount();
+        setFeedback({ message: `Jadwal pasien ${item.nama} telah ditandai batal.`, type: "success" });
+      } else {
+        setFeedback({ message: json.error || "Gagal membatalkan jadwal.", type: "error" });
+      }
+    } catch (err) {
+      console.error("Gagal membatalkan jadwal:", err);
+      setFeedback({ message: "Terjadi kesalahan saat membatalkan jadwal.", type: "error" });
+    }
+  };
+
   // Filtered appointments berdasarkan status dan kata kunci pencarian
   const filteredAppointments = appointments.filter((item) => {
     const matchStatus = statusFilter === "ALL" || item.status === statusFilter;
@@ -228,6 +262,8 @@ export default function AdminDashboard() {
       <HeaderNav
         unreadCount={unreadCount}
         isConnected={isConnected}
+        soundEnabled={soundEnabled}
+        onToggleSound={() => setSoundEnabled((prev) => !prev)}
         onOpenManualModal={() => setManualModal(true)}
         onOpenExportModal={() => setExportModal(true)}
         onOpenSettingsModal={() => setSettingsModal(true)}
@@ -286,6 +322,12 @@ export default function AdminDashboard() {
           onOpenScheduleModal={(item) => setScheduleModal({ open: true, appointment: item })}
           onOpenTreatmentModal={(item) => setTreatmentModal({ open: true, appointment: item })}
           onOpenReceiptModal={(item) => setReceiptModal({ open: true, appointment: item })}
+          onOpenPatientDetail={(item) => setPatientDetailModal({ open: true, appointment: item })}
+          onCancelAppointment={handleCancelAppointment}
+          onResetFilter={() => {
+            setStatusFilter("ALL");
+            setSearchQuery("");
+          }}
         />
       </main>
 
@@ -333,6 +375,14 @@ export default function AdminDashboard() {
         open={receiptModal.open}
         appointment={receiptModal.appointment}
         onClose={() => setReceiptModal({ open: false, appointment: null })}
+      />
+
+      <PatientDetailModal
+        open={patientDetailModal.open}
+        appointment={patientDetailModal.appointment}
+        onClose={() => setPatientDetailModal({ open: false, appointment: null })}
+        onOpenSchedule={(item) => setScheduleModal({ open: true, appointment: item })}
+        onOpenTreatment={(item) => setTreatmentModal({ open: true, appointment: item })}
       />
 
       {/* 7. Floating Realtime Notification Toast */}

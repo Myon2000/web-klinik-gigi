@@ -23,6 +23,22 @@ export function formatTanggal(dateStr, includeDayName = false) {
 }
 
 /**
+ * Hitung umur berdasarkan tanggal lahir
+ */
+export function calculateAge(birthDateStr) {
+  if (!birthDateStr) return null;
+  const birth = new Date(birthDateStr);
+  if (isNaN(birth.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age >= 0 ? age : null;
+}
+
+/**
  * Format nominal angka ke format mata uang Rupiah (contoh: Rp 250.000)
  */
 export function formatRupiah(number) {
