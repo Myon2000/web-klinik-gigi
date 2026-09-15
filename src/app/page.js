@@ -2,8 +2,17 @@
 
 import { useState, useEffect } from "react";
 
-// Komponen Modular Pasien
-import ClinicHeader from "@/components/patient/ClinicHeader";
+// Komponen Modular Landing Page
+import Navbar from "@/components/landing/Navbar";
+import HeroSection from "@/components/landing/HeroSection";
+import ServicesSection from "@/components/landing/ServicesSection";
+import WhyUsSection from "@/components/landing/WhyUsSection";
+import ScheduleSection from "@/components/landing/ScheduleSection";
+import LocationSection from "@/components/landing/LocationSection";
+import TestimonialsSection from "@/components/landing/TestimonialsSection";
+import FooterSection from "@/components/landing/FooterSection";
+
+// Komponen Formulir & Pop-up Pasien
 import StepGuide from "@/components/patient/StepGuide";
 import PatientForm from "@/components/patient/PatientForm";
 import SuccessModal from "@/components/patient/SuccessModal";
@@ -22,7 +31,7 @@ export default function Home() {
   const [cooldown, setCooldown] = useState(0);
   const [successModal, setSuccessModal] = useState({ open: false, data: null });
 
-  // Cooldown timer untuk tombol submit
+  // Cooldown timer untuk tombol submit anti-spam
   useEffect(() => {
     let timer;
     if (cooldown > 0) {
@@ -33,7 +42,7 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [cooldown]);
 
-  // Load informasi status klinik & pengumuman libur
+  // Memuat data status buka/tutup klinik & banner libur dari database
   useEffect(() => {
     fetch("/api/clinic-settings")
       .then((res) => res.json())
@@ -91,30 +100,46 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-between">
-      {/* 1. Header & Status Klinik */}
-      <ClinicHeader clinicInfo={clinicInfo} />
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+      {/* 1. Navbar dengan Indikator Status Praktik */}
+      <Navbar clinicInfo={clinicInfo} />
 
-      {/* 2. Konten Utama */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-10 w-full grow">
-        <StepGuide />
-        <PatientForm
-          formData={formData}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-          status={status}
-          cooldown={cooldown}
-        />
-      </main>
+      {/* 2. Hero Section */}
+      <HeroSection />
 
-      {/* 3. Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 mt-12">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} Klinik Gigi Dokter. Seluruh hak cipta dilindungi.</p>
+      {/* 3. Layanan Perawatan Gigi (Scaling, Tambal, Whitening, Cabut, dll.) */}
+      <ServicesSection />
+
+      {/* 4. Tentang Kami & Mengapa Memilih Klinik drg. Hetty */}
+      <WhyUsSection />
+
+      {/* 5. Jadwal Buka & Status Operasional Real-time */}
+      <ScheduleSection clinicInfo={clinicInfo} />
+
+      {/* 6. Lokasi & Peta Klinik di Kaliwates Jember */}
+      <LocationSection />
+
+      {/* 7. Testimoni Pasien */}
+      <TestimonialsSection />
+
+      {/* 8. Formulir Pendaftaran & Buat Janji Konsultasi Online */}
+      <section id="buat-janji" className="py-20 bg-white border-b border-slate-200/80 scroll-mt-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <StepGuide />
+          <PatientForm
+            formData={formData}
+            onChange={handleChange}
+            onSubmit={handleSubmit}
+            status={status}
+            cooldown={cooldown}
+          />
         </div>
-      </footer>
+      </section>
 
-      {/* 4. Pop-up Modal Notifikasi Berhasil */}
+      {/* 9. Footer Lengkap Kontak & Alamat Jember */}
+      <FooterSection />
+
+      {/* 10. Pop-up Modal Notifikasi Berhasil */}
       <SuccessModal
         open={successModal.open}
         data={successModal.data}
