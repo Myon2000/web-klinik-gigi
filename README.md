@@ -1,28 +1,52 @@
-# 🦷 Sistem Informasi & Pendaftaran Konsultasi Klinik Gigi
+# 🦷 Sistem Informasi, Profil Publik & Pendaftaran Janji Temu Klinik drg. Hetty Jember
 
-Aplikasi web modern untuk manajemen jadwal konsultasi pasien klinik gigi. Dibangun untuk memfasilitasi pasien agar dapat mendaftar janji temu secara online tanpa perlu login akun, serta memberikan kemudahan bagi admin/dokter dalam mengelola antrean pasien secara *real-time*, mengonfirmasi kedatangan via pesan WhatsApp dengan tautan unik, mencatat tindakan medis dan rincian biaya, serta mengekspor laporan ke format Excel.
+Aplikasi web modern profil klinik dokter gigi dan sistem reservasi janji temu pasien online. Dirancang khusus untuk **Klinik drg. Hetty P., MPH** di Kaliwates, Kabupaten Jember, guna memfasilitasi pasien dalam berkonsultasi dan mendaftar jadwal kunjungan tanpa perlu login akun, meningkatkan visibilitas klinik di mesin pencari Google (*Local SEO Jember*), serta menyediakan panel kontrol operasional real-time lengkap bagi admin dan dokter.
+
+🌐 **Website Produksi:** [https://klinikdrghetty.myon.my.id](https://klinikdrghetty.myon.my.id)  
+📍 **Lokasi Praktik:** Jl. P. Mangkubumi No.I, Kaliwates Kidul, Kaliwates, Kec. Kaliwates, Kabupaten Jember, Jawa Timur 68131  
 
 ---
 
-## 🌟 Fitur Utama
+## 🌟 Fitur Utama Sistem
 
-### 1. Sisi Pasien (Publik / Tanpa Login)
-- **Formulir Pendaftaran Sederhana:** Pasien cukup mengisi Nama, No. WhatsApp, Tempat/Tanggal Lahir, Alamat, dan Keluhan gigi.
-- **Proteksi Anti-Spam & Rate Limiting:** Pembatasan frekuensi pengiriman formulir per alamat IP dan jeda *cooldown* nomor HP untuk mencegah spam antrean.
-- **Pop-up Notifikasi Sukses:** Pemberitahuan pop-up instan setelah pendaftaran berhasil dikirim.
-- **Halaman Konfirmasi Kehadiran (`/konfirmasi/[token]`):** Pasien dapat membuka tautan unik yang dikirimkan via WhatsApp untuk menyatakan *"Ya, Saya Bersedia Hadir"* tanpa perlu login akun.
-- **Informasi Status & Jadwal Libur:** Menampilkan indikator klinik Buka/Tutup serta pengumuman jika dokter sedang cuti/libur.
+### 1. Sisi Pasien & Publik (Landing Page & Reservasi)
+- **Showcase Profil & 6 Layanan Spesialis:** Penjelasan lengkap mengenai *Pembersihan Karang Gigi (Scaling)*, *Tambal Gigi Komposit Sinar*, *Pemutihan Gigi (Bleaching/Whitening)*, *Cabut Gigi & Gigi Bungsu*, *Konsultasi & Pemeriksaan Diagnostik*, serta *Perawatan Gusi & Periodontal*.
+- **Kartu Statistik & Bukti Reputasi (*Why Us*):** Menampilkan rekam jejak praktik (10+ Tahun Pengalaman sejak 2015, 5.000+ Pasien Puas, dan 100% Standar Higienis Autoklaf Medis).
+- **Logika Operasional Cerdas Real-time WIB (Asia/Jakarta):**
+  - **Senin – Jumat (16:00 – 21:00 WIB):** Otomatis berstatus **Buka Sekarang** dengan indikator hijau berdenyut (*gentle pulse*).
+  - **Senin – Jumat (di luar 16:00 – 21:00 WIB):** Otomatis berstatus **Tutup (Buka 16:00 WIB)** dengan estimasi sisa waktu hitungan mundur.
+  - **Sabtu:** Otomatis berstatus **Tutup (Kecuali Janji Khusus)**.
+  - **Minggu:** Otomatis berstatus **Tutup (Hari Libur)**.
+- **Peta Google Maps Resmi Terintegrasi:** Embed resmi Google Maps Place dengan pin lokasi dan review rating 5.0 ★ *Praktek Drg. Hetty P., MPH*, dilengkapi tombol rute navigasi langsung.
+- **Formulir Pendaftaran Pasien (Tanpa Login):** Form responsif (Nama, No. WhatsApp, Tempat/Tanggal Lahir, Alamat, dan Keluhan) dengan validasi nomor HP Indonesia.
+- **Proteksi Anti-Spam & Rate Limiting:** Pembatasan frekuensi submit formulir berbasis alamat IP serta *cooldown timer* nomor WhatsApp untuk mencegah penumpukan data spam.
+- **Halaman Konfirmasi Mandiri (`/konfirmasi/[token]`):** Pasien dapat membuka tautan unik yang dikirim admin via WhatsApp untuk menyatakan kesediaan hadir (*"Ya, Saya Bersedia Hadir"*) secara instan.
+- **Animasi *Seamless* Ringan (60 FPS):** Implementasi *Scroll Reveal* berbasis browser `IntersectionObserver` dan akselerasi GPU (CSS/Tailwind) tanpa membebani performa perangkat ponsel.
 
-### 2. Sisi Admin & Dokter Gigi (`/admin`)
-- **Autentikasi Aman:** Sistem masuk admin tunggal dengan otentikasi session cookie HTTP-only berbasis JWT (`jose`) dan kata sandi terenkripsi (`bcrypt`).
-- **Pembaruan Antrean Real-time (Server-Sent Events / SSE):** Data pasien baru otomatis muncul di baris paling atas tabel antrean secara langsung tanpa admin perlu menekan tombol refresh (F5).
-- **Notifikasi Suara (*Audio Chime*) & Floating Toast:** Bunyi lonceng halus dan kartu notifikasi mengambang otomatis muncul saat ada pasien baru mendaftar.
-- **Indikator Status & Titik Merah (*Red Dot*):** Notifikasi titik merah berkedip untuk membedakan pasien baru yang belum diproses jadwalnya.
-- **Direct WhatsApp Broadcast:** Tombol **"Atur & WA"** yang otomatis membuka WhatsApp Web/Aplikasi dengan format pesan konfirmasi jadwal dan link persetujuan pasien.
-- **Pendaftaran Pasien Manual:** Memfasilitasi pendaftaran pasien yang datang langsung (*walk-in*) atau mendaftar via telepon.
-- **Catatan Rekam Tindakan & Pembayaran:** Input tindakan medis dokter gigi serta nominal total biaya setelah pasien selesai ditangani (status otomatis menjadi *Selesai*).
-- **Ekspor Laporan Excel (.xlsx):** Unduh rekapitulasi data pendaftaran, keluhan, tindakan medis, dan biaya dengan filter periode **Per Bulan** atau **Per 1 Tahun Penuh**.
-- **Pengaturan Operasional Klinik:** Mengubah status operasional klinik (Buka/Tutup) dan membuat pengumuman libur.
+### 2. Optimasi Mesin Pencari (Local SEO & Google Search Console)
+- **Schema.org Structured Data (`Dentist` JSON-LD):** Metadata terstruktur kaya kata kunci dokter gigi Jember, koordinat geo Kaliwates, nomor telepon, dan jam operasional untuk peringkat teratas Google Search & Google Maps.
+- **Sitemap Generator Otomatis (`/sitemap.xml`):** Peta situs XML berstandar resmi Google XML Sitemap Protocol.
+- **Robots Configuration (`/robots.txt`):** Pengaturan perayapan otomatis untuk Googlebot, Bingbot, dan Applebot sekaligus memblokir akses bot ke rute internal `/admin` dan `/api/*`.
+- **Verifikasi Terintegrasi:** Terpasang berkas verifikasi resmi Google Search Console (`googledfe8476829535dd7.html`) dan tag meta verifikasi.
+
+### 3. Sisi Panel Admin & Dokter Gigi (`/admin`)
+- **Autentikasi Aman & Proteksi Brute-Force:** Otentikasi berbasis HTTP-only Session Cookie JWT (`jose`) dan kata sandi terenkripsi (`bcryptjs`). Dilengkapi proteksi penguncian otomatis setelah 5 kali salah password dalam 15 menit.
+- **Penyembunyian Pintu Masuk Admin:** Tautan masuk admin sengaja ditiadakan dari tampilan publik depan untuk mencegah upaya intrusi.
+- **Sinkronisasi Real-Time (Server-Sent Events / SSE):** Data pendaftaran pasien baru langsung masuk ke antrean admin secara otomatis tanpa perlu me-refresh halaman (F5).
+- **Audio Chime & Floating Toast:** Bunyi notifikasi lonceng lembut dan kartu melayang saat pasien baru mendaftar (dilengkapi tombol *Mute/Unmute* suara).
+- **Filter Status Antrean & Reset 1-Klik:** Tab status terorganisir (*Semua, Menunggu Konfirmasi, Terkonfirmasi, Selesai, Batal*) dengan indikator badge jumlah pasien belum diproses.
+- **Direct WhatsApp Link Generator:** Tombol interaksi cepat yang membuka WhatsApp Web/Aplikasi dengan 3 preset template pesan resmi:
+  - *Template Konfirmasi Jadwal Baru* (dengan link persetujuan kehadiran pasien).
+  - *Template Pengingat Jadwal (H-1)*.
+  - *Template Penundaan / Keadaan Darurat*.
+- **Pendaftaran Pasien Manual:** Fitur input antrean pasien yang datang langsung (*walk-in*) atau mendaftar via telepon.
+- **Modal Rekam Tindakan & Catatan Dokter:** Dokter dapat mencatat riwayat tindakan medis, catatan perawatan internal (`catatanDokter`), dan total biaya tagihan.
+- **Cetak Nota Pembayaran / Invoice:** Generator kuitansi pembayaran pasien dengan format cetak profesional (*print-ready layout*).
+- **Ekspor Laporan Spreadsheet (.xlsx):** Rekapitulasi data pasien, riwayat tindakan, dan pendapatan dalam format Excel per bulan atau 1 tahun penuh.
+- **Visual Analytics Dashboard:**
+  - *Analisis Keluhan Pasien:* Klasifikasi otomatis 6 kategori keluhan terbanyak (Sakit/Ngilu, Karang Gigi, Gigi Berlubang, Estetika/Bleaching, Gigi Patah/Goyang, dan Cabut Gigi).
+  - *Peringkat Tindakan Medis:* Grafik tindakan medis paling sering dilakukan beserta total nominal pendapatan.
+- **Kontrol Pengaturan Klinik:** Admin dapat menyetel mode *Otomatis (Ikuti Jam Praktik)* atau *Paksa Tutup (Cuti Libur)* serta memasang teks banner pengumuman darurat.
 
 ---
 
@@ -31,20 +55,22 @@ Aplikasi web modern untuk manajemen jadwal konsultasi pasien klinik gigi. Dibang
 | Komponen | Teknologi | Keterangan |
 |---|---|---|
 | **Framework Fullstack** | [Next.js](https://nextjs.org/) (App Router, React 19) | Server Components, Streaming SSR & Route Handlers |
-| **Styling & UI** | [Tailwind CSS v4](https://tailwindcss.com/) & [Lucide Icons](https://lucide.dev/) | Tampilan antarmuka modern, bersih, dan responsif |
-| **Database** | [PostgreSQL](https://www.postgresql.org/) ([Neon Serverless](https://neon.tech/)) | Cloud Database dengan connection pooling bawaan |
-| **ORM Database** | [Prisma ORM v6](https://www.prisma.io/) | Skema basis data terstruktur & migrasi otomatis |
-| **Realtime Stream** | HTTP Server-Sent Events (SSE) | Kompatibel serverless Vercel tanpa dependensi socket eksternal |
-| **Keamanan & Auth** | Jose (JWT), Bcryptjs | Enkripsi kata sandi & validasi sesi cookie aman |
-| **Laporan Spreadsheet**| [SheetJS (XLSX)](https://sheetjs.com/) | Generator file Excel (.xlsx) di sisi server |
-| **Pengujian (Testing)**| [Playwright](https://playwright.dev/) | End-to-End (E2E) Test Suite otomatis |
-| **Platform Hosting** | [Vercel](https://vercel.com/) | Serverless Deployment |
+| **Styling & Desain** | [Tailwind CSS v4](https://tailwindcss.com/) & [Lucide Icons](https://lucide.dev/) | Utility-first CSS, modern, responsif, dan ringan |
+| **Animasi & Interaksi**| Native CSS GPU Acceleration & IntersectionObserver | Efek scroll-reveal mulus tanpa beban runtime bundle besar |
+| **Database** | [PostgreSQL](https://www.postgresql.org/) ([Neon Serverless](https://neon.tech/)) | Cloud Database dengan connection pooling aktif |
+| **ORM Database** | [Prisma ORM v6](https://www.prisma.io/) | Schema modeling & migrasi database terstruktur |
+| **Realtime Stream** | HTTP Server-Sent Events (SSE) | Kompatibel serverless Vercel tanpa perlu setup WebSocket eksternal |
+| **Keamanan & Auth** | Jose (JWT), Bcryptjs | Enkripsi hash password & HTTP-only cookies |
+| **Laporan Spreadsheet**| [SheetJS (XLSX)](https://sheetjs.com/) | Pembuatan file laporan Excel (.xlsx) di sisi server |
+| **Pengujian (Testing)**| [Playwright](https://playwright.dev/) | Pengujian otomatis alur sistem (End-to-End Test Suite) |
+| **Platform Hosting** | [Vercel](https://vercel.com/) | Serverless Edge Deployment |
+| **Domain Kustom** | IDwebhost DNS (`klinikdrghetty.myon.my.id`) | Terhubung aman via CNAME ke `cname.vercel-dns.com` |
 
 ---
 
 ## 🚀 Panduan Instalasi & Menjalankan Proyek Lokal
 
-Bagi rekan tim yang baru saja melakukan *clone* / *pull* repositori ini, ikuti langkah-langkah berikut:
+Bagi anggota tim pengembang atau penilai PKL yang ingin menjalankan aplikasi secara lokal:
 
 ### 1. Kloning Repositori
 ```bash
@@ -53,13 +79,13 @@ cd web-klinik-gigi
 ```
 
 ### 2. Instalasi Dependensi
-Pastikan kamu telah menginstal **Node.js (versi 20.x atau 24.x)**:
+Pastikan telah terpasang **Node.js (versi 20.x atau 24.x)**:
 ```bash
 npm install
 ```
 
 ### 3. Konfigurasi Environment Variable
-Salin template environment variable `.env.example` menjadi file `.env.local` atau `.env`:
+Salin berkas template `.env.example` menjadi `.env.local` atau `.env`:
 ```bash
 # Windows PowerShell:
 Copy-Item .env.example .env.local
@@ -68,31 +94,31 @@ Copy-Item .env.example .env.local
 cp .env.example .env.local
 ```
 
-Buka file `.env.local` dan sesuaikan koneksi database PostgreSQL Anda:
+Sesuaikan variabel di dalam `.env.local`:
 ```env
-# Contoh menggunakan PostgreSQL Cloud (Neon.tech):
-DATABASE_URL="postgresql://neondb_owner:password_kalian@ep-holy-frog-ax8px6dl-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require"
+# Koneksi Basis Data PostgreSQL (Cloud Neon atau Lokal):
+DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
 
-# ATAU contoh menggunakan PostgreSQL Lokal (pgAdmin / localhost):
-# DATABASE_URL="postgresql://postgres:password_kamu@localhost:5432/klinik_gigi"
+# Secret Key untuk Token JWT Admin:
+JWT_SECRET="ganti-dengan-secret-key-acak-yang-aman"
 
-# Kunci JWT untuk sesi admin:
-JWT_SECRET="klinik-gigi-super-secret-key-pkl-2026"
+# URL Publik Situs (untuk generator sitemap & link WA):
+NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 ```
 
-### 4. Sinkronisasi Basis Data & Seeding Awal
-Jalankan perintah Prisma untuk membuat tabel-tabel di database:
+### 4. Sinkronisasi Basis Data & Seeder
+Jalankan sinkronisasi skema Prisma ke database:
 ```bash
 npx prisma db push
 ```
 
-Jalankan script seeder untuk membuat akun admin default dan data klinik awal:
+Jalankan seeder untuk mengisi akun admin default dan data pengaturan awal:
 ```bash
 npx prisma db seed
 ```
 
-> **Kredensial Default Masuk Admin:**
-> - **URL Login:** `http://localhost:3000/admin/login`
+> **Kredensial Default Admin (Lingkungan Uji PKL):**
+> - **URL Login Admin:** `http://localhost:3000/admin/login`
 > - **Username:** `admin`
 > - **Password:** `admin123`
 
@@ -100,88 +126,111 @@ npx prisma db seed
 ```bash
 npm run dev
 ```
-Buka peramban (*browser*) dan akses:
-- **Halaman Pasien (Publik):** `http://localhost:3000`
-- **Halaman Konfirmasi Pasien:** `http://localhost:3000/konfirmasi/[token]`
-- **Dashboard Admin:** `http://localhost:3000/admin`
+Akses halaman melalui peramban:
+- **Halaman Utama & Profil Klinik:** `http://localhost:3000`
+- **Peta Situs XML:** `http://localhost:3000/sitemap.xml`
+- **Panel Masuk Admin:** `http://localhost:3000/admin/login`
+- **Dashboard Admin:** `http://localhost:3000/admin/dashboard`
 
 ---
 
-## 📊 Manajemen Data & Testing
+## 📊 Manajemen Data, Testing & Kualitas Kode
 
-### Melihat Data via Prisma Studio (Database GUI)
-Kamu bisa melihat dan mengelola isi tabel database secara visual lewat browser tanpa perlu membuka pgAdmin:
+### Database GUI (Prisma Studio)
+Untuk melihat dan mengelola isi tabel secara visual tanpa membuka DBMS terpisah:
 ```bash
 npx prisma studio
 ```
-Buka alamat `http://localhost:5555` di browser.
+Buka `http://localhost:5555` pada browser.
 
 ### Menjalankan Pengujian Otomatis (E2E Playwright)
-Untuk memastikan seluruh alur (pendaftaran pasien, validasi login admin, dan dashboard) berfungsi tanpa error:
+Uji seluruh alur sistem (pendaftaran formulir pasien, validasi login salah/benar, serta dasbor admin):
 ```bash
 npm run test:e2e
 ```
-Atau buka mode visual interaktif Playwright:
+Atau buka mode visual interaktif:
 ```bash
 npm run test:e2e:ui
 ```
 
-### Uji Build Produksi
-Sebelum melakukan deployment atau membuat Pull Request, pastikan aplikasi terbebas dari kesalahan kompilasi:
+### Pengecekan Kualitas Kode (Lint & Build)
 ```bash
+npm run lint
 npm run build
 ```
 
 ---
 
-## 📁 Struktur Direktori Utama
+## 📁 Struktur Direktori Proyek
 
 ```text
 web-klinik-gigi/
-├── e2e/                           # Skenario pengujian End-to-End (Playwright)
+├── e2e/                                # Pengujian Otomatis End-to-End (Playwright)
 │   └── klinik.spec.js
-├── prisma/                        # Konfigurasi basis data & skema ORM
-│   ├── schema.prisma              # Definisi model: Admin, Appointment, ClinicSetting, RateLimit
-│   └── seed.js                    # Seeder data awal akun admin & klinik
-├── public/                        # Aset statis & ikon
+├── prisma/                             # Skema ORM & Seeder Basis Data
+│   ├── schema.prisma                   # Model: Admin, Appointment, ClinicSetting, RateLimit
+│   └── seed.js                         # Seeder akun admin & data awal klinik
+├── public/                             # Aset Statis & Verifikasi Google
+│   └── googledfe8476829535dd7.html     # File verifikasi Google Search Console
 ├── src/
 │   ├── app/
-│   │   ├── admin/                 # Halaman panel admin (Dashboard & Login)
-│   │   ├── api/                   # REST API Endpoint Next.js
-│   │   │   ├── admin/             # Endpoint khusus manajemen admin & SSE Stream (/events)
-│   │   │   ├── appointments/      # Endpoint pendaftaran pasien & konfirmasi link WA
-│   │   │   └── clinic-settings/   # Endpoint status operasional klinik
-│   │   ├── konfirmasi/[token]/    # Halaman persetujuan jadwal kehadiran pasien
-│   │   ├── globals.css            # Styling global Tailwind CSS
-│   │   ├── layout.js              # Root layout Next.js
-│   │   └── page.js                # Halaman utama (Formulir Pendaftaran Pasien)
-│   └── lib/                       # Utility & library helper
-│       ├── auth.js                # Helper otentikasi JWT & Cookie session
-│       ├── events.js              # Event Bus untuk notifikasi real-time
-│       ├── prisma.js              # Prisma Client singleton
-│       └── rate-limiter.js        # Utilitas Anti-Spam (Limit IP & No. HP)
-├── .env.example                   # Template konfigurasi environment
-├── .gitignore                     # Berkas yang diabaikan oleh Git
-├── package.json                   # Konfigurasi paket dependensi & script
-├── playwright.config.js           # Konfigurasi Playwright Test Runner
-└── README.md                      # Dokumentasi utama proyek
+│   │   ├── admin/                      # Portal Admin
+│   │   │   ├── dashboard/              # Halaman dasbor operasional admin
+│   │   │   └── login/                  # Halaman masuk admin aman
+│   │   ├── api/                        # REST API Next.js Route Handlers
+│   │   │   ├── admin/                  # API data janji, ekspor excel, auth, & SSE stream
+│   │   │   ├── appointments/           # API pendaftaran pasien & konfirmasi kehadiran
+│   │   │   └── clinic-settings/        # API pengaturan jam operasional
+│   │   ├── konfirmasi/[token]/         # Halaman publik persetujuan jadwal pasien
+│   │   ├── globals.css                 # Styling Tailwind CSS & keyframe animasi
+│   │   ├── layout.js                   # Root layout, meta SEO Jember, & JSON-LD
+│   │   ├── page.js                     # Controller utama landing page & form pasien
+│   │   ├── robots.js                   # Generator robots.txt otomatis
+│   │   └── sitemap.js                  # Generator sitemap.xml standar Google
+│   ├── components/
+│   │   ├── admin/                      # Komponen Modular Dasbor Admin
+│   │   │   ├── modals/                 # Modal Export, Pasien Manual, Invoice, Detail, dll.
+│   │   │   ├── AnalyticsSection.js     # Grafik statistik keluhan & pendapatan tindakan
+│   │   │   ├── AppointmentTable.js     # Tabel antrean pasien & aksi WhatsApp
+│   │   │   ├── FilterBar.js            # Tab status, pencarian, & filter tanggal
+│   │   │   ├── HeaderNav.js            # Navbar admin, toggle suara, & profil
+│   │   │   ├── RealtimeToast.js        # Floating toast notifikasi pasien baru
+│   │   │   └── StatsGrid.js            # Kartu ringkasan metrik pasien
+│   │   ├── landing/                    # Komponen Modular Landing Page Publik
+│   │   │   ├── FooterSection.js        # Footer klinik & kontak
+│   │   │   ├── HeroSection.js          # Hero banner klinik gigi Jember
+│   │   │   ├── JsonLd.js               # Schema.org Dentist structured data
+│   │   │   ├── LocationSection.js      # Peta Google Maps resmi & rute lokasi
+│   │   │   ├── Navbar.js               # Navigasi publik & status klinik real-time
+│   │   │   ├── ScheduleSection.js      # Tabel jam operasional & logika buka/tutup
+│   │   │   ├── ServicesSection.js      # 6 Kartu layanan spesialis gigi
+│   │   │   ├── TestimonialsSection.js  # Ulasan & kepuasan pasien
+│   │   │   └── WhyUsSection.js         # Kartu keunggulan & statistik klinik
+│   │   ├── patient/                    # Komponen Alur Pendaftaran Pasien
+│   │   │   ├── PatientForm.js          # Formulir input data konsultasi
+│   │   │   ├── StepGuide.js            # Panduan alur pendaftaran 3 langkah
+│   │   │   └── SuccessModal.js         # Modal notifikasi berhasil submit
+│   │   └── ui/
+│   │       └── ScrollReveal.js         # Komponen animasi fade-in scroll seamless
+│   └── lib/                            # Modul Helper & Utilitas
+│       ├── auth.js                     # Otentikasi sesi cookie JWT & Bcrypt
+│       ├── clinicSchedule.js           # Logika waktu operasional WIB (Asia/Jakarta)
+│       ├── events.js                   # Real-time Event Bus (SSE Stream)
+│       ├── prisma.js                   # Prisma Client singleton
+│       └── rate-limiter.js             # Proteksi Anti-Spam (IP & No. HP)
+├── .env.example                        # Contoh berkas konfigurasi environment
+├── package.json                        # Paket dependensi proyek
+├── playwright.config.js                # Konfigurasi pengujian Playwright
+└── README.md                           # Berkas dokumentasi utama proyek
 ```
 
 ---
 
-## 🤝 Aturan Berkolaborasi untuk Tim
-1. **Selalu Pull Sebelum Mulai Bekerja:**
-   ```bash
-   git pull origin main
-   ```
-2. **Gunakan Branch Baru untuk Fitur Baru:**
-   ```bash
-   git checkout -b fitur/nama-fitur-kalian
-   ```
-3. **Jangan Melakukan Commit pada Berkas Sensitif:**
-   File `.env`, `.env.local`, atau kredensial database pribadi **tidak boleh di-push** ke repositori publik.
-4. **Jalankan `npm run build`** sebelum melakukan *merge* atau *push* untuk memastikan tidak ada kesalahan sintaks.
+## 🛡️ Standar Workflow & Manajemen Branch PKL
+1. **Branch Isolation:** Setiap pengembangan fitur, perbaikan bug, atau dokumentasi dikerjakan pada branch terpisah (`feat/...`, `fix/...`, `docs/...`).
+2. **Histori Utuh:** Seluruh riwayat cabang dipertahankan untuk kebutuhan rekam jejak portofolio dan laporan PKL.
+3. **Standar Rilis:** Setiap cabang wajib lulus uji `npm run lint`, `npm run build`, dan `npm run test:e2e` sebelum digabungkan (*merge*) ke cabang utama (`main`).
 
 ---
 
-*Proyek Praktik Kerja Lapangan (PKL) - Sistem Pendaftaran dan Konsultasi Pasien Klinik Gigi.*
+*Proyek Praktik Kerja Lapangan (PKL) — Dikembangkan untuk Klinik drg. Hetty P., MPH Kabupaten Jember.*
