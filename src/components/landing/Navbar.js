@@ -1,11 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Stethoscope, Menu, X, Calendar, AlertCircle } from "lucide-react";
+import { computeClinicStatus } from "@/lib/clinicSchedule";
 
 export default function Navbar({ clinicInfo }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick((t) => t + 1);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const status = computeClinicStatus(clinicInfo);
 
   const navLinks = [
     { label: "Home", href: "#home" },
@@ -61,14 +72,14 @@ export default function Navbar({ clinicInfo }) {
             {/* Status Badge & CTA Button */}
             <div className="hidden sm:flex items-center gap-3">
               {/* Dynamic Status Indicator */}
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 border border-slate-200/70">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 border border-slate-200/70">
                 <span
-                  className={`w-2 h-2 rounded-full ${
-                    clinicInfo?.isOpen ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
+                  className={`w-2 h-2 rounded-full ${status.dotColor} ${
+                    status.isOpen ? "animate-pulse" : ""
                   }`}
                 />
-                <span className={clinicInfo?.isOpen ? "text-emerald-700" : "text-rose-700"}>
-                  {clinicInfo?.isOpen ? "Klinik Buka" : "Klinik Tutup"}
+                <span className={status.isOpen ? "text-emerald-700" : "text-slate-700"}>
+                  {status.detailLabel}
                 </span>
               </div>
 
@@ -117,13 +128,9 @@ export default function Navbar({ clinicInfo }) {
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
               <span className="text-xs text-slate-500 font-medium">Status Praktik:</span>
               <span
-                className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                  clinicInfo?.isOpen
-                    ? "bg-emerald-100 text-emerald-800"
-                    : "bg-rose-100 text-rose-800"
-                }`}
+                className={`text-xs font-bold px-2.5 py-1 rounded-full border ${status.badgeBg}`}
               >
-                {clinicInfo?.isOpen ? "Klinik Buka" : "Klinik Tutup"}
+                {status.detailLabel}
               </span>
             </div>
           </div>

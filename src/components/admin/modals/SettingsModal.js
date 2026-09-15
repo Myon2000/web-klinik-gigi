@@ -56,24 +56,53 @@ export default function SettingsModal({ open, clinicSettings, setClinicSettings,
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
-          <div className="flex items-center justify-between bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
             <div>
-              <p className="font-semibold text-slate-900">Status Operasional Klinik</p>
+              <p className="font-bold text-slate-900 text-sm">Mode Operasional Praktik</p>
               <p className="text-[11px] text-slate-500 mt-0.5">
-                Ditampilkan sebagai indikator buka/tutup di web pasien.
+                Pilih apakah klinik beroperasi otomatis sesuai jadwal reguler (Senin - Jumat 16:00 - 21:00 WIB) atau dipaksa tutup karena cuti/libur khusus.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setLocalSettings({ ...localSettings, isOpen: !localSettings.isOpen })}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                localSettings.isOpen
-                  ? "bg-emerald-600 text-white"
-                  : "bg-rose-600 text-white"
-              }`}
-            >
-              {localSettings.isOpen ? "BUKA" : "TUTUP"}
-            </button>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setLocalSettings({ ...localSettings, isOpen: true })}
+                className={`px-3 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-1 ${
+                  localSettings.isOpen
+                    ? "bg-emerald-50 border-emerald-500 text-emerald-800 shadow-2xs ring-2 ring-emerald-400/20"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <span className="font-extrabold text-sm">Otomatis Aktif</span>
+                <span className="text-[10px] font-medium text-emerald-700">Ikuti jam praktik 16:00-21:00</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setLocalSettings({ ...localSettings, isOpen: false })}
+                className={`px-3 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-1 ${
+                  !localSettings.isOpen
+                    ? "bg-rose-50 border-rose-500 text-rose-800 shadow-2xs ring-2 ring-rose-400/20"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <span className="font-extrabold text-sm">Paksa Tutup</span>
+                <span className="text-[10px] font-medium text-rose-700">Tutup darurat / cuti libur</span>
+              </button>
+            </div>
+
+            <div className="bg-white p-2.5 rounded-lg border border-slate-200/80 text-[11px] text-slate-600">
+              {localSettings.isOpen ? (
+                <p>
+                  ✅ <strong>Sistem Otomatis Aktif:</strong> Website akan menampilkan status <em>&quot;Buka Sekarang&quot;</em> hanya pada hari Senin–Jumat pukul 16:00–21:00 WIB. Di luar jam tersebut atau akhir pekan, website otomatis menampilkan status <em>&quot;Tutup&quot;</em> tanpa perlu Anda ubah manual.
+                </p>
+              ) : (
+                <p>
+                  🛑 <strong>Paksa Tutup Aktif:</strong> Website akan selalu menampilkan status <em>&quot;Klinik Tutup&quot;</em> setiap saat sampai Anda mengaktifkannya kembali.
+                </p>
+              )}
+            </div>
           </div>
 
           <div>

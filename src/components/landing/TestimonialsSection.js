@@ -49,7 +49,7 @@ export default function TestimonialsSection() {
           {reviews.map((r) => (
             <div
               key={r.name}
-              className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow relative"
+              className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-xs flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative"
             >
               <div className="space-y-4">
                 {/* 5 Stars */}

@@ -16,6 +16,7 @@ import FooterSection from "@/components/landing/FooterSection";
 import StepGuide from "@/components/patient/StepGuide";
 import PatientForm from "@/components/patient/PatientForm";
 import SuccessModal from "@/components/patient/SuccessModal";
+import ScrollReveal from "@/components/ui/ScrollReveal";
 
 export default function Home() {
   const [clinicInfo, setClinicInfo] = useState({ isOpen: true, announcement: "" });
@@ -108,33 +109,45 @@ export default function Home() {
       <HeroSection />
 
       {/* 3. Layanan Perawatan Gigi (Scaling, Tambal, Whitening, Cabut, dll.) */}
-      <ServicesSection />
+      <ScrollReveal>
+        <ServicesSection />
+      </ScrollReveal>
 
       {/* 4. Tentang Kami & Mengapa Memilih Klinik drg. Hetty */}
-      <WhyUsSection />
+      <ScrollReveal>
+        <WhyUsSection />
+      </ScrollReveal>
 
       {/* 5. Jadwal Buka & Status Operasional Real-time */}
-      <ScheduleSection clinicInfo={clinicInfo} />
+      <ScrollReveal>
+        <ScheduleSection clinicInfo={clinicInfo} />
+      </ScrollReveal>
 
       {/* 6. Lokasi & Peta Klinik di Kaliwates Jember */}
-      <LocationSection />
+      <ScrollReveal>
+        <LocationSection />
+      </ScrollReveal>
 
       {/* 7. Testimoni Pasien */}
-      <TestimonialsSection />
+      <ScrollReveal>
+        <TestimonialsSection />
+      </ScrollReveal>
 
       {/* 8. Formulir Pendaftaran & Buat Janji Konsultasi Online */}
-      <section id="buat-janji" className="py-20 bg-white border-b border-slate-200/80 scroll-mt-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <StepGuide />
-          <PatientForm
-            formData={formData}
-            onChange={handleChange}
-            onSubmit={handleSubmit}
-            status={status}
-            cooldown={cooldown}
-          />
-        </div>
-      </section>
+      <ScrollReveal>
+        <section id="buat-janji" className="py-20 bg-white border-b border-slate-200/80 scroll-mt-16">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <StepGuide />
+            <PatientForm
+              formData={formData}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              status={status}
+              cooldown={cooldown}
+            />
+          </div>
+        </section>
+      </ScrollReveal>
 
       {/* 9. Footer Lengkap Kontak & Alamat Jember */}
       <FooterSection />

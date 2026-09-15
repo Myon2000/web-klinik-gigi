@@ -18,7 +18,7 @@ export default function HeroSection() {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28 text-white w-full">
         <div className="max-w-2xl">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30 backdrop-blur-md mb-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30 backdrop-blur-md mb-6 animate-soft-float">
             <Sparkles className="w-3.5 h-3.5 text-blue-400" />
             <span>Praktik Dokter Gigi Terpercaya di Kaliwates, Jember</span>
           </div>
