@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, ArrowRight, ShieldCheck, Sparkles, CheckCircle2 } from "lucide-react";
+import { Calendar, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export default function HeroSection() {
   return (
@@ -17,10 +17,12 @@ export default function HeroSection() {
       {/* Content Container */}
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28 text-white w-full">
         <div className="max-w-2xl">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30 backdrop-blur-md mb-6 animate-soft-float">
-            <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-            <span>Praktik Dokter Gigi Terpercaya di Kaliwates, Jember</span>
+          {/* Identity Tag (Clean, grounded medical tag, no AI slop) */}
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 text-slate-200 border border-slate-700/70 backdrop-blur-md mb-6 shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
+            <span className="tracking-normal font-medium text-slate-200">
+              Praktik Dokter Gigi Terpercaya di Kaliwates, Jember
+            </span>
           </div>
 
           {/* Heading 1 (SEO Keyword Rich) */}

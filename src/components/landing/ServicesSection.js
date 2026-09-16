@@ -1,113 +1,142 @@
 "use client";
 
-import { Sparkles, ShieldCheck, HeartPulse, Stethoscope, Smile, Activity, ArrowUpRight } from "lucide-react";
+import {
+  Droplets,
+  ShieldCheck,
+  Smile,
+  HeartPulse,
+  Stethoscope,
+  Activity,
+  ArrowRight,
+} from "lucide-react";
 
 export default function ServicesSection() {
   const services = [
     {
       id: "scaling",
+      num: "01",
       title: "Pembersihan Karang Gigi (Scaling)",
-      desc: "Scaling ultrasonik profesional untuk membersihkan plak, karang gigi, dan noda membandel serta mencegah radang gusi dan bau mulut.",
-      icon: Sparkles,
-      tag: "Populer",
-      color: "text-cyan-600 bg-cyan-50 border-cyan-200",
+      category: "Pencegahan & Kebersihan",
+      desc: "Pembersihan ultrasonik mendalam untuk menghilangkan plak dan karang gigi yang mengeras, mencegah radang gusi, serta mengatasi bau mulut.",
+      duration: "30 - 45 Menit",
+      icon: Droplets,
     },
     {
       id: "tambal",
-      title: "Tambal Gigi Komposit",
-      desc: "Restorasi gigi berlubang menggunakan material komposit sinar sewarna gigi alami yang kuat, estetis, dan tahan lama.",
+      num: "02",
+      title: "Tambal Gigi Komposit Sinar",
+      category: "Restorasi Estetis",
+      desc: "Penambalan gigi berlubang menggunakan resin komposit sewarna enamel asli. Kuat untuk mengunyah, tahan lama, dan menyatu alami dengan gigi.",
+      duration: "45 - 60 Menit",
       icon: ShieldCheck,
-      tag: "Esensial",
-      color: "text-blue-600 bg-blue-50 border-blue-200",
     },
     {
       id: "bleaching",
-      title: "Pemutihan Gigi (Whitening)",
-      desc: "Treatment bleaching klinis untuk mencerahkan warna gigi yang kusam atau kuning agar senyum Anda tampak lebih cerah dan percaya diri.",
+      num: "03",
+      title: "Pemutihan Gigi (Bleaching)",
+      category: "Estetika Senyum",
+      desc: "Treatment pencerahan warna gigi klinis yang aman untuk enamel, efektif memudarkan noda kopi, teh, dan penuaan agar senyum lebih percaya diri.",
+      duration: "60 Menit",
       icon: Smile,
-      tag: "Estetika",
-      color: "text-amber-600 bg-amber-50 border-amber-200",
     },
     {
       id: "cabut",
+      num: "04",
       title: "Cabut Gigi & Gigi Bungsu",
-      desc: "Prosedur ekstraksi gigi bermasalah atau pencabutan gigi bungsu (odontektomi) dengan anestesi lokal yang aman dan minim rasa sakit.",
+      category: "Penanganan Bedah Minor",
+      desc: "Pencabutan gigi bermasalah atau impaksi gigi bungsu dengan prosedur higienis dan anestesi lokal presisi untuk meminimalkan rasa nyeri.",
+      duration: "30 - 60 Menit",
       icon: HeartPulse,
-      tag: "Bedah Minor",
-      color: "text-rose-600 bg-rose-50 border-rose-200",
     },
     {
       id: "konsultasi",
-      title: "Konsultasi & Pemeriksaan Gigi",
-      desc: "Pemeriksaan menyeluruh kondisi rongga mulut dan gigi dengan evaluasi dokter gigi profesional untuk menemukan solusi perawatan terbaik.",
+      num: "05",
+      title: "Pemeriksaan & Konsultasi Gigi",
+      category: "Diagnostik Komprehensif",
+      desc: "Evaluasi menyeluruh kondisi kesehatan gigi, rongga mulut, dan gusi bersama dokter untuk menemukan akar penyebab keluhan dan rencana terapi.",
+      duration: "20 - 30 Menit",
       icon: Stethoscope,
-      tag: "Diagnostik",
-      color: "text-emerald-600 bg-emerald-50 border-emerald-200",
     },
     {
       id: "gusi",
-      title: "Perawatan Gusi & Jaringan Mulut",
-      desc: "Penanganan gusi berdarah, bengkak, sariawan, dan penyakit periodontal guna menjaga gigi tetap tertanam kuat dan sehat.",
+      num: "06",
+      title: "Perawatan Gusi & Periodontal",
+      category: "Kesehatan Jaringan Mulut",
+      desc: "Perawatan khusus untuk gusi berdarah, pembengkakan, sariawan berulang, serta infeksi jaringan penyangga gigi agar gigi tetap kokoh.",
+      duration: "30 - 45 Menit",
       icon: Activity,
-      tag: "Periodontal",
-      color: "text-purple-600 bg-purple-50 border-purple-200",
     },
   ];
 
   return (
-    <section id="layanan" className="py-20 bg-slate-50 border-b border-slate-200/80">
+    <section id="layanan" className="py-24 bg-slate-50 border-b border-slate-200/80">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100/80 text-blue-700 border border-blue-200 mb-3">
-            Layanan Perawatan Gigi Terlengkap
-          </span>
+        {/* Section Header: Minimalist & Confident */}
+        <div className="max-w-2xl mx-auto text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200/80 text-xs font-semibold text-slate-700 shadow-2xs mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+            <span>Layanan Praktik Medis</span>
+          </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Layanan Klinik drg. Hetty
+            Perawatan Gigi Berkualitas
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
-            Berbagai perawatan gigi profesional untuk kesehatan, kenyamanan, dan keindahan senyum keluarga Anda di Kaliwates, Jember.
+            Penanganan klinis terstandar dengan peralatan modern dan higienis untuk menjaga kesehatan serta estetika senyum Anda di Kaliwates, Jember.
           </p>
         </div>
 
-        {/* Services Cards Grid */}
+        {/* Services Cards Grid: Dribbble-inspired Minimalist Architectural Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((item) => {
             const Icon = item.icon;
             return (
-              <div
+              <a
                 key={item.id}
-                className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs hover:shadow-lg hover:border-blue-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+                href="#buat-janji"
+                className="group relative bg-white rounded-2xl p-7 border border-slate-200/90 shadow-2xs hover:shadow-lg hover:border-slate-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between text-left"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${item.color}`}>
-                      <Icon className="w-6 h-6" />
+                  {/* Top Bar: Icon + Number index */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-700 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors duration-300 shadow-2xs">
+                      <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
                     </div>
-                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                      {item.tag}
+                    <span className="font-mono text-xs font-semibold text-slate-400 group-hover:text-blue-600 transition-colors duration-300">
+                      {item.num}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  {/* Category Pill */}
+                  <span className="inline-block text-[11px] font-semibold text-blue-700 mb-2 tracking-wide">
+                    {item.category}
+                  </span>
+
+                  {/* Title */}
+                  <h3 className="text-lg font-bold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors duration-200 mb-3">
                     {item.title}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  {/* Description */}
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
                     {item.desc}
                   </p>
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
-                  <a
-                    href="#buat-janji"
-                    className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 group/link"
-                  >
-                    <span>Daftar Janji Konsultasi</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
-                  </a>
+                {/* Card Footer: Metadata & Action Arrow */}
+                <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-emerald-500 transition-colors" />
+                    <span>Est. {item.duration}</span>
+                  </div>
+
+                  <div className="inline-flex items-center gap-1.5 font-bold text-blue-600 group-hover:text-blue-700">
+                    <span className="text-xs font-semibold">Jadwalkan</span>
+                    <div className="w-6 h-6 rounded-full bg-blue-50 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all duration-300">
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </a>
             );
           })}
         </div>
