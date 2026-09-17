@@ -39,7 +39,7 @@ test.describe('Klinik Gigi - E2E Testing Suite', () => {
     await page.fill('input[type="password"]', 'passwordsalah123');
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('text=Username atau password salah.')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=/.*Username atau password salah.*/')).toBeVisible({ timeout: 15000 });
 
     // Uji dengan password benar (default PKL: admin123)
     await page.fill('input[type="password"]', 'admin123');

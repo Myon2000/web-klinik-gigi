@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { createAdminToken } from '@/lib/auth';
+import { createAdminToken, generateSessionToken } from '@/lib/auth';
 import { getClientIp, isRateLimited, recordFailure, clearRateLimit } from '@/lib/rate-limiter';
 
 // Hash dummy untuk mencegah timing attack jika username tidak ditemukan
@@ -54,9 +54,17 @@ export async function POST(request) {
     // 2. Jika login berhasil, bersihkan catatan kegagalan rate limit
     await clearRateLimit(rateLimitKey);
 
+    // 3. Buat sesi token baru untuk Single Active Session
+    const sessionToken = generateSessionToken();
+    await prisma.admin.update({
+      where: { id: admin.id },
+      data: { sessionToken },
+    });
+
     const token = await createAdminToken({
       id: admin.id,
       username: admin.username,
+      sessionToken,
     });
 
     const response = NextResponse.json({

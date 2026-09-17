@@ -1,6 +1,6 @@
 "use client";
 
-import { Phone, MapPin, Clock, Send, Stethoscope, Check, FileText, Printer, Ban, RotateCcw, Eye, AlertTriangle } from "lucide-react";
+import { Phone, MapPin, Clock, Send, Stethoscope, Check, FileText, Printer, Ban, RotateCcw, Eye, AlertTriangle, Trash2 } from "lucide-react";
 import { formatTanggal, formatRupiah } from "@/lib/formatters";
 
 export default function AppointmentTable({
@@ -11,6 +11,7 @@ export default function AppointmentTable({
   onOpenReceiptModal,
   onOpenPatientDetail,
   onCancelAppointment,
+  onDeleteAppointment,
   onResetFilter,
 }) {
   const getStatusBadge = (status) => {
@@ -235,12 +236,20 @@ export default function AppointmentTable({
                         {item.status !== "SELESAI" && item.status !== "BATAL" && (
                           <button
                             onClick={() => onCancelAppointment?.(item)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer text-xs"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 border border-transparent hover:border-amber-200 transition-colors cursor-pointer text-xs"
                             title="Tandai Batal / Pasien Tidak Hadir"
                           >
                             <Ban className="w-3.5 h-3.5" />
                           </button>
                         )}
+
+                        <button
+                          onClick={() => onDeleteAppointment?.(item)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer text-xs"
+                          title="Hapus Data Pasien"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </td>
                   </tr>

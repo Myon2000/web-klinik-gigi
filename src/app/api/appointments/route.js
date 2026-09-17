@@ -6,7 +6,7 @@ import { appointmentEvents } from '@/lib/events';
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { nama, nomor_hp, tempat_lahir, tanggal_lahir, alamat, keluhan } = body;
+    const { nama, nomor_hp, tempat_lahir, tanggal_lahir, alamat, keluhan, rencana_kunjungan } = body;
 
     // 1. Validasi Kelengkapan Kolom & Tipe Data
     if (
@@ -106,6 +106,10 @@ export async function POST(request) {
         tanggalLahir: parsedBirthDate,
         alamat: cleanAlamat,
         keluhan: cleanKeluhan,
+        rencanaKunjungan:
+          typeof rencana_kunjungan === 'string' && rencana_kunjungan.trim()
+            ? rencana_kunjungan.trim()
+            : null,
         status: 'MENUNGGU_JADWAL',
         sumber: 'WEB',
         isRead: false,

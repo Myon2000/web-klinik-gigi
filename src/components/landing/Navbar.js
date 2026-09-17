@@ -25,6 +25,7 @@ export default function Navbar({ clinicInfo }) {
     { label: "Lokasi", href: "#lokasi" },
     { label: "Tentang", href: "#tentang" },
     { label: "Testimoni", href: "#testimoni" },
+    { label: "FAQ", href: "#faq" },
   ];
 
   return (

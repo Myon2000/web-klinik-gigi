@@ -10,6 +10,7 @@ import WhyUsSection from "@/components/landing/WhyUsSection";
 import ScheduleSection from "@/components/landing/ScheduleSection";
 import LocationSection from "@/components/landing/LocationSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
+import FaqSection from "@/components/landing/FaqSection";
 import FooterSection from "@/components/landing/FooterSection";
 
 // Komponen Formulir & Pop-up Pasien
@@ -17,6 +18,7 @@ import StepGuide from "@/components/patient/StepGuide";
 import PatientForm from "@/components/patient/PatientForm";
 import SuccessModal from "@/components/patient/SuccessModal";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import FloatingWhatsApp from "@/components/ui/FloatingWhatsApp";
 
 export default function Home() {
   const [clinicInfo, setClinicInfo] = useState({ isOpen: true, announcement: "" });
@@ -27,6 +29,7 @@ export default function Home() {
     tanggal_lahir: "",
     alamat: "",
     keluhan: "",
+    rencana_kunjungan: "",
   });
   const [status, setStatus] = useState({ loading: false, message: "", type: "", token: null });
   const [cooldown, setCooldown] = useState(0);
@@ -75,7 +78,7 @@ export default function Home() {
       if (response.ok && result.success) {
         const submittedData = { nama: formData.nama, nomor_hp: formData.nomor_hp };
         setStatus({ loading: false, message: "", type: "", token: null });
-        setFormData({ nama: "", nomor_hp: "", tempat_lahir: "", tanggal_lahir: "", alamat: "", keluhan: "" });
+        setFormData({ nama: "", nomor_hp: "", tempat_lahir: "", tanggal_lahir: "", alamat: "", keluhan: "", rencana_kunjungan: "" });
         setCooldown(30); // Cooldown 30 detik untuk cegah spam
         setSuccessModal({ open: true, data: submittedData });
       } else {
@@ -133,7 +136,12 @@ export default function Home() {
         <TestimonialsSection />
       </ScrollReveal>
 
-      {/* 8. Formulir Pendaftaran & Buat Janji Konsultasi Online */}
+      {/* 8. Tanya Jawab Pasien (FAQ) */}
+      <ScrollReveal>
+        <FaqSection />
+      </ScrollReveal>
+
+      {/* 9. Formulir Pendaftaran & Buat Janji Konsultasi Online */}
       <ScrollReveal>
         <section id="buat-janji" className="py-20 bg-white border-b border-slate-200/80 scroll-mt-16">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
@@ -149,10 +157,13 @@ export default function Home() {
         </section>
       </ScrollReveal>
 
-      {/* 9. Footer Lengkap Kontak & Alamat Jember */}
+      {/* 10. Footer Lengkap Kontak & Alamat Jember */}
       <FooterSection />
 
-      {/* 10. Pop-up Modal Notifikasi Berhasil */}
+      {/* 11. Tombol Melayang WhatsApp Quick Action */}
+      <FloatingWhatsApp />
+
+      {/* 12. Pop-up Modal Notifikasi Berhasil */}
       <SuccessModal
         open={successModal.open}
         data={successModal.data}

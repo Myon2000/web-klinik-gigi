@@ -128,6 +128,22 @@ export default function PatientForm({
             />
           </div>
 
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              Rencana Tanggal Kunjungan <span className="text-slate-400 font-normal lowercase">(opsional)</span>
+            </label>
+            <input
+              type="date"
+              name="rencana_kunjungan"
+              value={formData.rencana_kunjungan || ""}
+              onChange={onChange}
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+            <p className="text-[11px] text-slate-500 mt-1">
+              Pilihan estimasi tanggal Anda ingin berkonsultasi (Praktik reguler Senin - Jumat pukul 16:00 - 21:00 WIB).
+            </p>
+          </div>
+
           <div className="pt-2">
             <button
               type="submit"

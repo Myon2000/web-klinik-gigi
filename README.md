@@ -18,7 +18,9 @@ Aplikasi web modern profil klinik dokter gigi dan sistem reservasi janji temu pa
   - **Sabtu:** Otomatis berstatus **Tutup (Kecuali Janji Khusus)**.
   - **Minggu:** Otomatis berstatus **Tutup (Hari Libur)**.
 - **Peta Google Maps Resmi Terintegrasi:** Embed resmi Google Maps Place dengan pin lokasi dan review rating 5.0 ★ *Praktek Drg. Hetty P., MPH*, dilengkapi tombol rute navigasi langsung.
-- **Formulir Pendaftaran Pasien (Tanpa Login):** Form responsif (Nama, No. WhatsApp, Tempat/Tanggal Lahir, Alamat, dan Keluhan) dengan validasi nomor HP Indonesia.
+- **Formulir Pendaftaran Pasien (Tanpa Login):** Form responsif (Nama, No. WhatsApp, Tempat/Tanggal Lahir, Alamat, Keluhan, dan Pilihan Estimasi Tanggal Kunjungan) dengan validasi nomor HP Indonesia.
+- **Tanya Jawab Pasien (FAQ Accordion):** Informasi transparan mengenai layanan non-BPJS, metode pembayaran QRIS/Transfer/Tunai, pendaftaran online, perawatan gigi anak, dan persiapan tindakan medis.
+- **Tombol Melayang WhatsApp (*Floating Quick-Action*):** Tombol WhatsApp mengambang di pojok kanan bawah dengan template pesan konsultasi instan.
 - **Proteksi Anti-Spam & Rate Limiting:** Pembatasan frekuensi submit formulir berbasis alamat IP serta *cooldown timer* nomor WhatsApp untuk mencegah penumpukan data spam.
 - **Halaman Konfirmasi Mandiri (`/konfirmasi/[token]`):** Pasien dapat membuka tautan unik yang dikirim admin via WhatsApp untuk menyatakan kesediaan hadir (*"Ya, Saya Bersedia Hadir"*) secara instan.
 - **Animasi *Seamless* Ringan (60 FPS):** Implementasi *Scroll Reveal* berbasis browser `IntersectionObserver` dan akselerasi GPU (CSS/Tailwind) tanpa membebani performa perangkat ponsel.
@@ -30,6 +32,10 @@ Aplikasi web modern profil klinik dokter gigi dan sistem reservasi janji temu pa
 - **Verifikasi Terintegrasi:** Terpasang berkas verifikasi resmi Google Search Console (`googledfe8476829535dd7.html`) dan tag meta verifikasi.
 
 ### 3. Sisi Panel Admin & Dokter Gigi (`/admin`)
+- **Single Active Session & Inactivity Auto-Logout:** Sesi admin otomatis ditendang keluar jika akun dibuka di perangkat/laptop lain, serta otomatis terkunci jika tidak ada aktivitas selama 15 menit.
+- **Ganti Kata Sandi & Username Mandiri:** Fitur pembaruan kredensial akun dokter/admin langsung dari dasbor dengan enkripsi Bcrypt.
+- **Agenda Pasien Hari Ini (*Today's Schedule Card*):** Kartu ringkasan interaktif di atas dasbor yang merangkum jadwal janji temu pasien hari ini secara kronologis jam praktik (16:00 - 21:00 WIB).
+- **Hapus Data Pasien & Reset Antrean Uji (*Data Management*):** Tombol hapus antrean individual dengan modal konfirmasi aman, serta opsi pembersihan data testing 1-klik yang dilindungi konfirmasi kata sandi admin.
 - **Autentikasi Aman & Proteksi Brute-Force:** Otentikasi berbasis HTTP-only Session Cookie JWT (`jose`) dan kata sandi terenkripsi (`bcryptjs`). Dilengkapi proteksi penguncian otomatis setelah 5 kali salah password dalam 15 menit.
 - **Penyembunyian Pintu Masuk Admin:** Tautan masuk admin sengaja ditiadakan dari tampilan publik depan untuk mencegah upaya intrusi.
 - **Sinkronisasi Real-Time (Server-Sent Events / SSE):** Data pendaftaran pasien baru langsung masuk ke antrean admin secara otomatis tanpa perlu me-refresh halaman (F5).

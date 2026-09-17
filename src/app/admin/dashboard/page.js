@@ -7,6 +7,7 @@ import { CheckCircle2, AlertCircle, X } from "lucide-react";
 // Komponen Modular Admin
 import HeaderNav from "@/components/admin/HeaderNav";
 import StatsGrid from "@/components/admin/StatsGrid";
+import TodayAgendaCard from "@/components/admin/TodayAgendaCard";
 import AnalyticsSection from "@/components/admin/AnalyticsSection";
 import FilterBar from "@/components/admin/FilterBar";
 import AppointmentTable from "@/components/admin/AppointmentTable";
@@ -20,6 +21,7 @@ import ExportModal from "@/components/admin/modals/ExportModal";
 import SettingsModal from "@/components/admin/modals/SettingsModal";
 import ReceiptModal from "@/components/admin/modals/ReceiptModal";
 import PatientDetailModal from "@/components/admin/modals/PatientDetailModal";
+import DeleteConfirmationModal from "@/components/admin/modals/DeleteConfirmationModal";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -40,6 +42,33 @@ export default function AdminDashboard() {
   const [settingsModal, setSettingsModal] = useState(false);
   const [receiptModal, setReceiptModal] = useState({ open: false, appointment: null });
   const [patientDetailModal, setPatientDetailModal] = useState({ open: false, appointment: null });
+  const [deleteModal, setDeleteModal] = useState({ open: false, appointment: null, loading: false });
+
+  // Inactivity Auto-Logout (15 Menit)
+  useEffect(() => {
+    let timeoutId;
+    const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 menit
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(async () => {
+        try {
+          await fetch("/api/admin/auth/logout", { method: "POST" });
+        } catch {}
+        router.push("/admin/login?reason=inactivity");
+      }, INACTIVITY_LIMIT);
+    };
+
+    const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+    activityEvents.forEach((ev) => window.addEventListener(ev, resetTimer));
+
+    resetTimer();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      activityEvents.forEach((ev) => window.removeEventListener(ev, resetTimer));
+    };
+  }, [router]);
 
   // Status & Notifikasi Realtime
   const [feedback, setFeedback] = useState({ message: "", type: "" });
@@ -212,7 +241,33 @@ export default function AdminDashboard() {
     }
   };
 
-  // Handler Batalkan Jadwal Pasien
+  // Handler Hapus Pasien Permanen
+  const handleDeleteAppointment = (item) => {
+    setDeleteModal({ open: true, appointment: item, loading: false });
+  };
+
+  const handleConfirmDelete = async (id) => {
+    setDeleteModal((prev) => ({ ...prev, loading: true }));
+    try {
+      const res = await fetch(`/api/admin/appointments/${id}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setAppointments((prev) => prev.filter((a) => a.id !== id));
+        fetchUnreadCount();
+        setDeleteModal({ open: false, appointment: null, loading: false });
+        setFeedback({ message: "Data pendaftaran pasien berhasil dihapus.", type: "success" });
+      } else {
+        setFeedback({ message: json.error || "Gagal menghapus data pasien.", type: "error" });
+        setDeleteModal((prev) => ({ ...prev, loading: false }));
+      }
+    } catch (err) {
+      console.error("Gagal hapus pasien:", err);
+      setFeedback({ message: "Terjadi kesalahan jaringan saat menghapus.", type: "error" });
+      setDeleteModal((prev) => ({ ...prev, loading: false }));
+    }
+  };
   const handleCancelAppointment = async (item) => {
     const confirmed = window.confirm(`Apakah Anda yakin ingin menandai antrean pasien "${item.nama}" sebagai BATAL?`);
     if (!confirmed) return;
@@ -295,17 +350,25 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* 3. Kartu Ringkasan Statistik */}
+        {/* 3. Agenda Pasien Hari Ini */}
+        <TodayAgendaCard
+          appointments={appointments}
+          onOpenScheduleModal={(item) => setScheduleModal({ open: true, appointment: item })}
+          onOpenTreatmentModal={(item) => setTreatmentModal({ open: true, appointment: item })}
+          onOpenPatientDetail={(item) => setPatientDetailModal({ open: true, appointment: item })}
+        />
+
+        {/* 4. Kartu Ringkasan Statistik */}
         <StatsGrid
           stats={stats}
           statusFilter={statusFilter}
           setStatusFilter={setStatusFilter}
         />
 
-        {/* 4. Analitik & Grafik Tren Keluhan Pasien serta Tindakan Medis */}
+        {/* 5. Analitik & Grafik Tren Keluhan Pasien serta Tindakan Medis */}
         <AnalyticsSection appointments={appointments} />
 
-        {/* 5. Filter Status & Kolom Pencarian */}
+        {/* 6. Filter Status & Kolom Pencarian */}
         <FilterBar
           totalCount={appointments.length}
           menungguJadwalCount={stats.menungguJadwal}
@@ -315,7 +378,7 @@ export default function AdminDashboard() {
           setSearchQuery={setSearchQuery}
         />
 
-        {/* 6. Tabel Daftar Jadwal & Tindakan */}
+        {/* 7. Tabel Daftar Jadwal & Tindakan */}
         <AppointmentTable
           appointments={filteredAppointments}
           loading={loading}
@@ -324,6 +387,7 @@ export default function AdminDashboard() {
           onOpenReceiptModal={(item) => setReceiptModal({ open: true, appointment: item })}
           onOpenPatientDetail={(item) => setPatientDetailModal({ open: true, appointment: item })}
           onCancelAppointment={handleCancelAppointment}
+          onDeleteAppointment={handleDeleteAppointment}
           onResetFilter={() => {
             setStatusFilter("ALL");
             setSearchQuery("");
@@ -369,6 +433,10 @@ export default function AdminDashboard() {
         setClinicSettings={setClinicSettings}
         onClose={() => setSettingsModal(false)}
         setFeedback={setFeedback}
+        onDataReset={() => {
+          fetchAppointments();
+          fetchUnreadCount();
+        }}
       />
 
       <ReceiptModal
@@ -383,6 +451,14 @@ export default function AdminDashboard() {
         onClose={() => setPatientDetailModal({ open: false, appointment: null })}
         onOpenSchedule={(item) => setScheduleModal({ open: true, appointment: item })}
         onOpenTreatment={(item) => setTreatmentModal({ open: true, appointment: item })}
+      />
+
+      <DeleteConfirmationModal
+        open={deleteModal.open}
+        appointment={deleteModal.appointment}
+        loading={deleteModal.loading}
+        onClose={() => setDeleteModal({ open: false, appointment: null, loading: false })}
+        onConfirm={handleConfirmDelete}
       />
 
       {/* 7. Floating Realtime Notification Toast */}
