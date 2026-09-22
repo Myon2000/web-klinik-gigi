@@ -67,11 +67,23 @@ export default function Home() {
     e.preventDefault();
     setStatus({ loading: true, message: "", type: "", token: null });
 
+    // Periksa nilai honeypot langsung dari elemen fisik DOM untuk menangkap intervensi bot / DevTools
+    const formElement = e.currentTarget;
+    const domHoneypot =
+      formElement?.elements?.["user_website"]?.value ||
+      formElement?.querySelector?.('input[name="user_website"]')?.value ||
+      "";
+
+    const payload = {
+      ...formData,
+      user_website: domHoneypot || formData.user_website || "",
+    };
+
     try {
       const response = await fetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
