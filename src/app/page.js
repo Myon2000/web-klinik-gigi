@@ -72,6 +72,7 @@ export default function Home() {
     const domHoneypot =
       formElement?.elements?.["user_website"]?.value ||
       formElement?.querySelector?.('input[name="user_website"]')?.value ||
+      (typeof document !== "undefined" ? document.querySelector('input[name="user_website"]')?.value : "") ||
       "";
 
     const payload = {
@@ -89,6 +90,9 @@ export default function Home() {
       const result = await response.json();
 
       if (response.ok && result.success) {
+        if (formElement?.elements?.["user_website"]) {
+          formElement.elements["user_website"].value = "";
+        }
         const submittedData = { nama: formData.nama, nomor_hp: formData.nomor_hp };
         setStatus({ loading: false, message: "", type: "", token: null });
         setFormData({ nama: "", nomor_hp: "", tempat_lahir: "", tanggal_lahir: "", alamat: "", keluhan: "", rencana_kunjungan: "", user_website: "" });

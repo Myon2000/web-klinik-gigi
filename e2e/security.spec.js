@@ -40,6 +40,35 @@ test.describe('Security Utilities - Unit & Logic Verification', () => {
     expect(json.data.token).toBe('trapped');
   });
 
+  test('3b. Honeypot Bot Trap dari UI browser: input DOM yang diisi tidak terhapus saat mengetik dan dibuang', async ({ page }) => {
+    await page.goto('/');
+
+    // 1. Bot atau DevTools mengisi honeypot
+    await page.evaluate(() => {
+      document.querySelector('input[name="user_website"]').value = "http://bot-console-trap.com";
+    });
+
+    // 2. Ketik kolom-kolom lain (memastikan re-render React tidak menghapus nilai honeypot)
+    const uniquePhone = '0899' + Math.floor(10000000 + Math.random() * 90000000);
+    await page.fill('input[name="nama"]', 'Bot Spammer Browser');
+    await page.fill('input[name="nomor_hp"]', uniquePhone);
+    await page.fill('input[name="tempat_lahir"]', 'Cyber');
+    await page.fill('input[name="tanggal_lahir"]', '1999-01-01');
+    await page.fill('textarea[name="alamat"]', 'Internet');
+    await page.fill('textarea[name="keluhan"]', 'Spamming via browser');
+
+    // 3. Verifikasi sebelum submit bahwa honeypot tetap terisi
+    const honeypotVal = await page.evaluate(() => document.querySelector('input[name="user_website"]').value);
+    expect(honeypotVal).toBe('http://bot-console-trap.com');
+
+    // 4. Submit
+    await page.click('button[type="submit"]');
+
+    // 5. Modal sukses tetap muncul (agar bot mengira sukses)
+    const popupHeading = page.getByRole('heading', { name: 'Pendaftaran Konsultasi Berhasil!' });
+    await expect(popupHeading).toBeVisible({ timeout: 20000 });
+  });
+
   test('4. Server mengembalikan Security Headers lengkap (CSP, HSTS, X-Frame-Options, dll)', async ({ request }) => {
     const res = await request.get('/');
     expect(res.status()).toBe(200);

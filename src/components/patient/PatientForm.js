@@ -25,15 +25,14 @@ export default function PatientForm({
         )}
 
         <form onSubmit={onSubmit} className="space-y-4">
-          {/* Honeypot Bot Trap: Tersembunyi dari manusia, menjebak bot spammer otomatis */}
+          {/* Honeypot Bot Trap: Uncontrolled input, tidak terpengaruh re-render React saat mengetik */}
           <div aria-hidden="true" className="opacity-0 absolute -z-10 w-0 h-0 overflow-hidden pointer-events-none select-none">
             <label htmlFor="user_website">Website</label>
             <input
               id="user_website"
               type="text"
               name="user_website"
-              value={formData.user_website || ""}
-              onChange={onChange}
+              defaultValue=""
               tabIndex={-1}
               autoComplete="off"
             />
