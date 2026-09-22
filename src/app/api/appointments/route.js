@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getClientIp, checkRateLimit, checkPhoneCooldown } from '@/lib/rate-limiter';
 import { appointmentEvents } from '@/lib/events';
+import { sanitizeText } from '@/lib/sanitize';
 
 export async function POST(request) {
   try {
@@ -23,11 +24,15 @@ export async function POST(request) {
       );
     }
 
-    const cleanNama = nama.replace(/\0/g, '').trim();
-    const cleanHp = nomor_hp.replace(/\0/g, '').trim();
-    const cleanTempat = tempat_lahir.replace(/\0/g, '').trim();
-    const cleanAlamat = alamat.replace(/\0/g, '').trim();
-    const cleanKeluhan = keluhan.replace(/\0/g, '').trim();
+    // Sanitasi input teks dari tag HTML dan karakter berbahaya (Stored XSS Defense)
+    const cleanNama = sanitizeText(nama);
+    const cleanHp = sanitizeText(nomor_hp);
+    const cleanTempat = sanitizeText(tempat_lahir);
+    const cleanAlamat = sanitizeText(alamat);
+    const cleanKeluhan = sanitizeText(keluhan);
+    const cleanRencana = typeof rencana_kunjungan === 'string' && rencana_kunjungan.trim()
+      ? sanitizeText(rencana_kunjungan)
+      : null;
 
     if (!cleanNama || !cleanHp || !cleanTempat || !cleanAlamat || !cleanKeluhan) {
       return NextResponse.json(
@@ -106,10 +111,7 @@ export async function POST(request) {
         tanggalLahir: parsedBirthDate,
         alamat: cleanAlamat,
         keluhan: cleanKeluhan,
-        rencanaKunjungan:
-          typeof rencana_kunjungan === 'string' && rencana_kunjungan.trim()
-            ? rencana_kunjungan.trim()
-            : null,
+        rencanaKunjungan: cleanRencana,
         status: 'MENUNGGU_JADWAL',
         sumber: 'WEB',
         isRead: false,

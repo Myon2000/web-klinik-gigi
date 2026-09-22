@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAdminSession } from '@/lib/auth';
+import { sanitizeText } from '@/lib/sanitize';
 
 export async function GET(request) {
   try {
@@ -83,7 +84,13 @@ export async function POST(request) {
       status,
     } = body;
 
-    if (!nama || !nomor_hp || !alamat || !keluhan) {
+    const cleanNama = sanitizeText(nama);
+    const cleanHp = sanitizeText(nomor_hp);
+    const cleanTempat = sanitizeText(tempat_lahir) || '-';
+    const cleanAlamat = sanitizeText(alamat);
+    const cleanKeluhan = sanitizeText(keluhan);
+
+    if (!cleanNama || !cleanHp || !cleanAlamat || !cleanKeluhan) {
       return NextResponse.json(
         { error: 'Nama, No. WhatsApp, Alamat, dan Keluhan wajib diisi.' },
         { status: 400 }
@@ -92,12 +99,12 @@ export async function POST(request) {
 
     const newAppointment = await prisma.appointment.create({
       data: {
-        nama: nama.trim(),
-        nomorHp: nomor_hp.trim(),
-        tempatLahir: tempat_lahir ? tempat_lahir.trim() : '-',
+        nama: cleanNama,
+        nomorHp: cleanHp,
+        tempatLahir: cleanTempat,
         tanggalLahir: tanggal_lahir ? new Date(tanggal_lahir) : new Date(),
-        alamat: alamat.trim(),
-        keluhan: keluhan.trim(),
+        alamat: cleanAlamat,
+        keluhan: cleanKeluhan,
         tanggalJanji: tanggal_janji ? new Date(tanggal_janji) : null,
         jamJanji: jam_janji || null,
         status: status || 'TERKONFIRMASI',

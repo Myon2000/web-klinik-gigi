@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAdminSession } from '@/lib/auth';
+import { sanitizeExcelCell } from '@/lib/sanitize';
 import * as XLSX from 'xlsx';
 
 export async function GET(request) {
@@ -47,17 +48,17 @@ export async function GET(request) {
     const rows = appointments.map((item, index) => ({
       No: index + 1,
       'Tanggal Daftar': formatDate(item.createdAt),
-      Sumber: item.sumber,
-      'Nama Pasien': item.nama,
-      'No. WhatsApp': item.nomorHp,
-      'Tempat, Tanggal Lahir': `${item.tempatLahir}, ${formatDate(item.tanggalLahir)}`,
-      Alamat: item.alamat,
-      Keluhan: item.keluhan,
+      Sumber: sanitizeExcelCell(item.sumber),
+      'Nama Pasien': sanitizeExcelCell(item.nama),
+      'No. WhatsApp': sanitizeExcelCell(item.nomorHp),
+      'Tempat, Tanggal Lahir': sanitizeExcelCell(`${item.tempatLahir}, ${formatDate(item.tanggalLahir)}`),
+      Alamat: sanitizeExcelCell(item.alamat),
+      Keluhan: sanitizeExcelCell(item.keluhan),
       'Tanggal Janji': formatDate(item.tanggalJanji),
-      'Jam Janji': item.jamJanji || '-',
-      Status: item.status,
-      'Tindakan Dokter Gigi': item.tindakan || '-',
-      'Catatan Khusus Dokter': item.catatanDokter || '-',
+      'Jam Janji': sanitizeExcelCell(item.jamJanji || '-'),
+      Status: sanitizeExcelCell(item.status),
+      'Tindakan Dokter Gigi': sanitizeExcelCell(item.tindakan || '-'),
+      'Catatan Khusus Dokter': sanitizeExcelCell(item.catatanDokter || '-'),
       'Biaya (Rp)': item.biaya ? Number(item.biaya) : 0,
     }));
 
