@@ -21,7 +21,44 @@ export async function middleware(request) {
   const payload = token ? await verifyToken(token) : null;
   const isAuthenticated = Boolean(payload?.id);
 
-  // 1. Jika mengakses halaman login tetapi sudah login -> alihkan langsung ke dashboard
+  // 1. Proteksi CSRF (Cross-Site Request Forgery) pada mutasi admin & pengaturan klinik
+  if (
+    (pathname.startsWith('/api/admin') || pathname === '/api/clinic-settings') &&
+    ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)
+  ) {
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
+    const host = request.headers.get('host');
+
+    // Blokir jika origin adalah 'null' (misal dari sandboxed iframe jahat)
+    if (origin === 'null') {
+      return new NextResponse(
+        JSON.stringify({ error: 'Akses ditolak: Permintaan tidak sah (Null Origin).' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    let requestOriginHost = null;
+    if (origin) {
+      try {
+        requestOriginHost = new URL(origin).host;
+      } catch {}
+    } else if (referer) {
+      try {
+        requestOriginHost = new URL(referer).host;
+      } catch {}
+    }
+
+    // Jika origin atau referer berasal dari luar domain klinik (Cross-Origin), tolak akses
+    if (requestOriginHost && host && requestOriginHost !== host) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Akses ditolak: Verifikasi keamanan CSRF gagal (Origin Mismatch).' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+  }
+
+  // 2. Jika mengakses halaman login tetapi sudah login -> alihkan langsung ke dashboard
   if (pathname === '/admin/login') {
     if (isAuthenticated) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
@@ -29,7 +66,7 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
-  // 2. Proteksi rute halaman admin (/admin, /admin/dashboard, dll)
+  // 3. Proteksi rute halaman admin (/admin, /admin/dashboard, dll)
   if (pathname.startsWith('/admin')) {
     if (!isAuthenticated) {
       const loginUrl = new URL('/admin/login', request.url);
@@ -43,5 +80,7 @@ export async function middleware(request) {
 export const config = {
   matcher: [
     '/admin/:path*',
+    '/api/admin/:path*',
+    '/api/clinic-settings',
   ],
 };

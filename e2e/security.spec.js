@@ -53,4 +53,34 @@ test.describe('Security Utilities - Unit & Logic Verification', () => {
     expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
     expect(headers['cross-origin-opener-policy']).toBe('same-origin-allow-popups');
   });
+
+  test('5. Proteksi CSRF menolak mutasi admin yang berasal dari Origin asing (Cross-Origin)', async ({ request }) => {
+    const res = await request.patch('/api/admin/appointments/1', {
+      headers: {
+        Origin: 'https://evil-hacker-site.com',
+      },
+      data: {
+        status: 'BATAL',
+      },
+    });
+
+    expect(res.status()).toBe(403);
+    const json = await res.json();
+    expect(json.error).toContain('Origin Mismatch');
+  });
+
+  test('6. Proteksi CSRF menolak mutasi admin dengan Origin "null"', async ({ request }) => {
+    const res = await request.post('/api/admin/appointments', {
+      headers: {
+        Origin: 'null',
+      },
+      data: {
+        nama: 'Attack',
+      },
+    });
+
+    expect(res.status()).toBe(403);
+    const json = await res.json();
+    expect(json.error).toContain('Null Origin');
+  });
 });
