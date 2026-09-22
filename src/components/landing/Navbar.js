@@ -73,13 +73,14 @@ export default function Navbar({ clinicInfo }) {
             {/* Status Badge & CTA Button */}
             <div className="hidden sm:flex items-center gap-3">
               {/* Dynamic Status Indicator */}
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 border border-slate-200/70">
+              <div suppressHydrationWarning className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 border border-slate-200/70">
                 <span
+                  suppressHydrationWarning
                   className={`w-2 h-2 rounded-full ${status.dotColor} ${
                     status.isOpen ? "animate-pulse" : ""
                   }`}
                 />
-                <span className={status.isOpen ? "text-emerald-700" : "text-slate-700"}>
+                <span suppressHydrationWarning className={status.isOpen ? "text-emerald-700" : "text-slate-700"}>
                   {status.detailLabel}
                 </span>
               </div>
@@ -129,6 +130,7 @@ export default function Navbar({ clinicInfo }) {
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
               <span className="text-xs text-slate-500 font-medium">Status Praktik:</span>
               <span
+                suppressHydrationWarning
                 className={`text-xs font-bold px-2.5 py-1 rounded-full border ${status.badgeBg}`}
               >
                 {status.detailLabel}

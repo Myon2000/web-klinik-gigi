@@ -40,13 +40,15 @@ export default function ScheduleSection({ clinicInfo }) {
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
                 Status Klinik Saat Ini
               </span>
-              <div className="flex items-center gap-2.5">
+              <div suppressHydrationWarning className="flex items-center gap-2.5">
                 <span
+                  suppressHydrationWarning
                   className={`w-3 h-3 rounded-full ${status.dotColor} ${
                     status.isOpen ? "animate-pulse" : ""
                   }`}
                 />
                 <span
+                  suppressHydrationWarning
                   className={`text-xl font-extrabold ${
                     status.isOpen ? "text-emerald-700" : "text-slate-800"
                   }`}
@@ -54,7 +56,7 @@ export default function ScheduleSection({ clinicInfo }) {
                   {status.detailLabel}
                 </span>
               </div>
-              <p className="text-xs text-slate-600 mt-2 leading-relaxed font-medium">
+              <p suppressHydrationWarning className="text-xs text-slate-600 mt-2 leading-relaxed font-medium">
                 {status.explanation}
               </p>
             </div>
@@ -92,17 +94,18 @@ export default function ScheduleSection({ clinicInfo }) {
               <span>Jam Buka Praktik</span>
             </div>
 
-            <div className="divide-y divide-slate-100 text-xs">
+            <div suppressHydrationWarning className="divide-y divide-slate-100 text-xs">
               {REGULAR_SCHEDULE.map((item) => {
                 const isToday = item.dayIndex === currentDayIndex;
                 return (
                   <div
                     key={item.day}
+                    suppressHydrationWarning
                     className={`px-6 py-3.5 flex items-center justify-between transition-colors ${
                       isToday ? "bg-blue-50/70 font-semibold" : "hover:bg-slate-50/60"
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div suppressHydrationWarning className="flex items-center gap-2.5">
                       <span className={isToday ? "text-blue-900 font-extrabold" : "text-slate-800 font-medium"}>
                         {item.day}
                       </span>
@@ -113,6 +116,7 @@ export default function ScheduleSection({ clinicInfo }) {
                       )}
                     </div>
                     <span
+                      suppressHydrationWarning
                       className={`font-mono text-xs ${
                         item.isOpenDay
                           ? isToday
