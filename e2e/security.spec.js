@@ -20,4 +20,23 @@ test.describe('Security Utilities - Unit & Logic Verification', () => {
     expect(sanitizeExcelCell("-1000")).toBe("'-1000");
     expect(sanitizeExcelCell("Budi Santoso")).toBe("Budi Santoso");
   });
+
+  test('3. Honeypot Bot Trap menjebak bot otomatis dan melakukan Silent Drop', async ({ request }) => {
+    const res = await request.post('/api/appointments', {
+      data: {
+        nama: 'Bot Spammer',
+        nomor_hp: '081299998888',
+        tempat_lahir: 'Unknown',
+        tanggal_lahir: '2000-01-01',
+        alamat: 'http://spam-link.com',
+        keluhan: 'Buy cheap watches now',
+        user_website: 'http://bot-automated-spammer.com',
+      },
+    });
+
+    expect(res.status()).toBe(201);
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.data.token).toBe('trapped');
+  });
 });

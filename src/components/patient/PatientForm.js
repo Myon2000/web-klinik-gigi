@@ -25,6 +25,20 @@ export default function PatientForm({
         )}
 
         <form onSubmit={onSubmit} className="space-y-4">
+          {/* Honeypot Bot Trap: Tersembunyi dari manusia, menjebak bot spammer otomatis */}
+          <div aria-hidden="true" className="opacity-0 absolute -z-10 w-0 h-0 overflow-hidden pointer-events-none select-none">
+            <label htmlFor="user_website">Website</label>
+            <input
+              id="user_website"
+              type="text"
+              name="user_website"
+              value={formData.user_website || ""}
+              onChange={onChange}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
           <div>
             <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
               Nama Lengkap <span className="text-rose-500">*</span>

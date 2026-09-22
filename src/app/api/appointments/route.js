@@ -7,7 +7,27 @@ import { sanitizeText } from '@/lib/sanitize';
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { nama, nomor_hp, tempat_lahir, tanggal_lahir, alamat, keluhan, rencana_kunjungan } = body;
+    const { nama, nomor_hp, tempat_lahir, tanggal_lahir, alamat, keluhan, rencana_kunjungan, user_website } = body;
+
+    // 0. Honeypot Bot Trap (CWE-352 / Anti-Automated Spam):
+    // Jika field jebakan ini terisi nilai, permintaan 100% berasal dari bot scraper otomatis.
+    // Server melakukan "Silent Drop" (mengembalikan respon sukses palsu tanpa menyimpan ke database).
+    if (user_website && String(user_website).trim() !== '') {
+      console.warn(`[Security Honeypot] Bot spam terdeteksi dan dibuang dari IP: ${getClientIp(request)}`);
+      return NextResponse.json(
+        {
+          success: true,
+          message: 'Pendaftaran konsultasi berhasil dikirim.',
+          data: {
+            id: 0,
+            token: 'trapped',
+            nama: 'trapped',
+            status: 'MENUNGGU_JADWAL',
+          },
+        },
+        { status: 201 }
+      );
+    }
 
     // 1. Validasi Kelengkapan Kolom & Tipe Data
     if (

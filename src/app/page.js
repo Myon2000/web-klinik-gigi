@@ -30,6 +30,7 @@ export default function Home() {
     alamat: "",
     keluhan: "",
     rencana_kunjungan: "",
+    user_website: "",
   });
   const [status, setStatus] = useState({ loading: false, message: "", type: "", token: null });
   const [cooldown, setCooldown] = useState(0);
@@ -78,7 +79,7 @@ export default function Home() {
       if (response.ok && result.success) {
         const submittedData = { nama: formData.nama, nomor_hp: formData.nomor_hp };
         setStatus({ loading: false, message: "", type: "", token: null });
-        setFormData({ nama: "", nomor_hp: "", tempat_lahir: "", tanggal_lahir: "", alamat: "", keluhan: "", rencana_kunjungan: "" });
+        setFormData({ nama: "", nomor_hp: "", tempat_lahir: "", tanggal_lahir: "", alamat: "", keluhan: "", rencana_kunjungan: "", user_website: "" });
         setCooldown(30); // Cooldown 30 detik untuk cegah spam
         setSuccessModal({ open: true, data: submittedData });
       } else {
