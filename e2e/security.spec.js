@@ -39,4 +39,18 @@ test.describe('Security Utilities - Unit & Logic Verification', () => {
     expect(json.success).toBe(true);
     expect(json.data.token).toBe('trapped');
   });
+
+  test('4. Server mengembalikan Security Headers lengkap (CSP, HSTS, X-Frame-Options, dll)', async ({ request }) => {
+    const res = await request.get('/');
+    expect(res.status()).toBe(200);
+
+    const headers = res.headers();
+    expect(headers['content-security-policy']).toBeDefined();
+    expect(headers['content-security-policy']).toContain("default-src 'self'");
+    expect(headers['strict-transport-security']).toContain('max-age=63072000');
+    expect(headers['x-frame-options']).toBe('SAMEORIGIN');
+    expect(headers['x-content-type-options']).toBe('nosniff');
+    expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
+    expect(headers['cross-origin-opener-policy']).toBe('same-origin-allow-popups');
+  });
 });
