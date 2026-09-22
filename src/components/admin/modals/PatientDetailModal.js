@@ -65,13 +65,13 @@ export default function PatientDetailModal({ open, appointment, onClose, onOpenS
             </p>
           </div>
 
-          {/* Rencana Kunjungan Pasien (Jika Ada) */}
-          {appointment.rencanaKunjungan && (
-            <div className="bg-amber-50/70 p-3 rounded-xl border border-amber-200/70 text-amber-900 text-xs flex items-center justify-between">
-              <span className="font-medium text-[11px] text-amber-800">Rencana Kunjungan Pasien:</span>
-              <span className="font-bold">{appointment.rencanaKunjungan}</span>
-            </div>
-          )}
+          {/* Rencana Kunjungan Pasien */}
+          <div className="bg-blue-50/60 p-3 rounded-xl border border-blue-100 text-blue-900 text-xs flex items-center justify-between">
+            <span className="font-medium text-[11px] text-blue-800">Rencana Kunjungan Pasien:</span>
+            <span className="font-bold">
+              {appointment.rencanaKunjungan ? formatTanggal(appointment.rencanaKunjungan) : "Bisa kapan saja (Fleksibel)"}
+            </span>
+          </div>
 
           {/* Status & Waktu Janji */}
           <div className="grid grid-cols-2 gap-3">

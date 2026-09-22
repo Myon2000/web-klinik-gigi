@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Send, X, MessageSquare, Sparkles } from "lucide-react";
-import { buildWhatsAppLink, getWhatsAppTemplates } from "@/lib/formatters";
+import { buildWhatsAppLink, getWhatsAppTemplates, formatTanggal } from "@/lib/formatters";
 
 export default function ScheduleModal({ open, appointment, onClose, onSuccess, setFeedback }) {
   const today = new Date().toISOString().split("T")[0];
@@ -22,6 +22,8 @@ export default function ScheduleModal({ open, appointment, onClose, onSuccess, s
   if (appointment && appointment.id !== prevId) {
     const initialDate = appointment.tanggalJanji
       ? new Date(appointment.tanggalJanji).toISOString().split("T")[0]
+      : appointment.rencanaKunjungan
+      ? appointment.rencanaKunjungan
       : today;
     const initialTime = appointment.jamJanji || "16:00";
 
@@ -144,6 +146,20 @@ export default function ScheduleModal({ open, appointment, onClose, onSuccess, s
             <p className="font-semibold text-slate-800 text-sm">{appointment.nama}</p>
             <p className="text-slate-500 mt-0.5">WhatsApp: {appointment.nomorHp}</p>
             <p className="text-slate-600 italic mt-1">&ldquo;{appointment.keluhan}&rdquo;</p>
+            <div className="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center justify-between text-[11px]">
+              <span className="text-slate-500 font-medium">Rencana Kunjungan Pasien:</span>
+              <span
+                className={`font-semibold ${
+                  appointment.rencanaKunjungan
+                    ? "text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200"
+                    : "text-slate-500 italic"
+                }`}
+              >
+                {appointment.rencanaKunjungan
+                  ? formatTanggal(appointment.rencanaKunjungan)
+                  : "Bisa kapan saja (Fleksibel)"}
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">

@@ -1,6 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { Calendar, Clock, MapPin, Phone, AlertCircle, ShieldCheck } from "lucide-react";
+
+function getTodayWibString() {
+  try {
+    const today = new Date();
+    const wib = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
+    const yyyy = wib.getFullYear();
+    const mm = String(wib.getMonth() + 1).padStart(2, "0");
+    const dd = String(wib.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  } catch {
+    return new Date().toISOString().split("T")[0];
+  }
+}
 
 export default function PatientForm({
   formData,
@@ -9,6 +23,8 @@ export default function PatientForm({
   status,
   cooldown,
 }) {
+  const [minDate] = useState(() => getTodayWibString());
+
   return (
     <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div className="p-6 sm:p-8">
@@ -148,12 +164,13 @@ export default function PatientForm({
             <input
               type="date"
               name="rencana_kunjungan"
+              min={minDate || undefined}
               value={formData.rencana_kunjungan || ""}
               onChange={onChange}
               className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
             <p className="text-[11px] text-slate-500 mt-1">
-              Pilihan estimasi tanggal Anda ingin berkonsultasi (Praktik reguler Senin - Jumat pukul 16:00 - 21:00 WIB).
+              Pilihan estimasi tanggal Anda ingin berkonsultasi (Mulai hari ini, jadwal reguler Senin - Jumat pukul 16:00 - 21:00 WIB).
             </p>
           </div>
 

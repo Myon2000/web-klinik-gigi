@@ -69,15 +69,22 @@ export default function Home() {
 
     // Periksa nilai honeypot langsung dari elemen fisik DOM untuk menangkap intervensi bot / DevTools
     const formElement = e.currentTarget;
-    const domHoneypot =
-      formElement?.elements?.["user_website"]?.value ||
-      formElement?.querySelector?.('input[name="user_website"]')?.value ||
-      (typeof document !== "undefined" ? document.querySelector('input[name="user_website"]')?.value : "") ||
-      "";
+    let domHoneypot = "";
+    try {
+      if (typeof FormData !== "undefined" && formElement) {
+        domHoneypot = new FormData(formElement).get("user_website") || "";
+      }
+    } catch {}
+    if (!domHoneypot && formElement?.elements?.["user_website"]) {
+      domHoneypot = formElement.elements["user_website"].value || "";
+    }
+    if (!domHoneypot && typeof document !== "undefined") {
+      domHoneypot = document.querySelector('input[name="user_website"]')?.value || "";
+    }
 
     const payload = {
       ...formData,
-      user_website: domHoneypot || formData.user_website || "",
+      user_website: String(domHoneypot || formData.user_website || "").trim(),
     };
 
     try {

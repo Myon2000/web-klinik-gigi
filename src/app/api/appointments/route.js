@@ -94,6 +94,25 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Tanggal lahir tidak realistis.' }, { status: 400 });
     }
 
+    // Validasi rencana tanggal kunjungan jika diisi oleh pasien (Minimal Hari Ini)
+    if (cleanRencana) {
+      const parsedVisitDate = new Date(cleanRencana);
+      if (isNaN(parsedVisitDate.getTime())) {
+        return NextResponse.json({ error: 'Format rencana tanggal kunjungan tidak valid.' }, { status: 400 });
+      }
+
+      const nowWib = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+      const startOfTodayWib = new Date(nowWib.getFullYear(), nowWib.getMonth(), nowWib.getDate(), 0, 0, 0);
+      const visitDateOnly = new Date(parsedVisitDate.getFullYear(), parsedVisitDate.getMonth(), parsedVisitDate.getDate(), 0, 0, 0);
+
+      if (visitDateOnly < startOfTodayWib) {
+        return NextResponse.json(
+          { error: 'Rencana tanggal kunjungan tidak boleh tanggal yang sudah lewat.' },
+          { status: 400 }
+        );
+      }
+    }
+
     // 2. Rate Limiting Berdasarkan IP Address (Maks 3 pengiriman per 10 menit)
     const clientIp = getClientIp(request);
     const ipCheck = await checkRateLimit(`ip:${clientIp}`, 3, 10);

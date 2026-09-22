@@ -43,6 +43,7 @@
 Thumbs.db
 desktop.ini
 *.pem
+PANDUAN_PENGUJIAN_KEAMANAN.md
 
 # Debug Logs
 npm-debug.log*

@@ -63,7 +63,7 @@ Sistem web menerapkan standar keamanan OWASP Top 10 dan standar perlindungan dat
 4. **Honeypot Bot Trap:** Kolom tersembunyi untuk menjebak bot spam otomatis dengan respon *Silent Drop* (tanpa membuang kuota database).
 5. **Proteksi CSRF (Origin & Referer Guard):** Edge middleware memverifikasi kecocokan origin pada semua mutasi data admin (`POST`, `PUT`, `PATCH`, `DELETE`).
 6. **HTTP Security Headers Lengkap:** Strict-Transport-Security (HSTS 2 Tahun Preload), Content-Security-Policy (CSP), COOP, X-Frame-Options, dan X-Content-Type-Options.
-7. **Panduan Lengkap Pengujian Keamanan:** Tersedia pada dokumen khusus [**PANDUAN_PENGUJIAN_KEAMANAN.md**](./PANDUAN_PENGUJIAN_KEAMANAN.md).
+7. **Pengujian Keamanan Otomatis:** Dilengkapi skenario uji otomatis Playwright (`e2e/security.spec.js`) yang memvalidasi XSS, Formula Injection, Honeypot, CSRF, dan Audit Log.
 
 ---
 
@@ -242,7 +242,6 @@ web-klinik-gigi/
 │       ├── prisma.js                   # Prisma Client singleton
 │       ├── rate-limiter.js             # Proteksi Anti-Spam (IP & No. HP)
 │       └── sanitize.js                 # Sanitasi XSS & Formula Injection Excel
-├── PANDUAN_PENGUJIAN_KEAMANAN.md       # Panduan langkah-langkah pengujian manual keamanan
 ├── .env.example                        # Contoh berkas konfigurasi environment
 ├── package.json                        # Paket dependensi proyek
 ├── playwright.config.js                # Konfigurasi pengujian Playwright

@@ -171,4 +171,22 @@ test.describe('Security Utilities - Unit & Logic Verification', () => {
     const tokenCookie = cookies.find((c) => c.name === 'admin_token');
     expect(tokenCookie).toBeUndefined();
   });
+
+  test('9. Backend menolak rencana_kunjungan yang tanggalnya di masa lalu (kemarin)', async ({ request }) => {
+    const res = await request.post('/api/appointments', {
+      data: {
+        nama: 'Pasien Kemarin',
+        nomor_hp: '081288887777',
+        tempat_lahir: 'Jakarta',
+        tanggal_lahir: '1995-01-01',
+        alamat: 'Jl. Waktu',
+        keluhan: 'Gigi sakit kemarin',
+        rencana_kunjungan: '2020-01-01',
+      },
+    });
+
+    expect(res.status()).toBe(400);
+    const json = await res.json();
+    expect(json.error).toContain('tidak boleh tanggal yang sudah lewat');
+  });
 });

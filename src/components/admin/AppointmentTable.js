@@ -169,10 +169,22 @@ export default function AppointmentTable({
                           </p>
                         </div>
                       ) : (
-                        <span className="text-xs text-rose-600 font-bold italic bg-rose-50 px-2 py-1 rounded">
+                        <span className="text-xs text-rose-600 font-bold italic bg-rose-50 px-2 py-0.5 rounded border border-rose-200 block w-fit mb-1">
                           Belum Ditentukan
                         </span>
                       )}
+
+                      {/* Info Usulan Rencana Kunjungan Pasien */}
+                      <div className="mt-1 flex items-center gap-1 text-[11px]">
+                        <span className="text-slate-400">Rencana:</span>
+                        {item.rencanaKunjungan ? (
+                          <span className="font-semibold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                            {formatTanggal(item.rencanaKunjungan)}
+                          </span>
+                        ) : (
+                          <span className="text-slate-500 italic">Bisa kapan saja</span>
+                        )}
+                      </div>
                     </td>
 
                     {/* Status */}
