@@ -33,6 +33,7 @@ Aplikasi web modern profil klinik dokter gigi dan sistem reservasi janji temu pa
 
 ### 3. Sisi Panel Admin & Dokter Gigi (`/admin`)
 - **Single Active Session & Inactivity Auto-Logout:** Sesi admin otomatis ditendang keluar jika akun dibuka di perangkat/laptop lain, serta otomatis terkunci jika tidak ada aktivitas selama 15 menit.
+- **Log Audit Keamanan Terintegrasi (*Security Audit Trail*):** Mencatat 50 riwayat aktivitas sensitif (login berhasil/gagal, ubah kata sandi, hapus pasien, reset antrean) lengkap dengan alamat IP, aktor, dan cap waktu ke tabel database PostgreSQL.
 - **Ganti Kata Sandi & Username Mandiri:** Fitur pembaruan kredensial akun dokter/admin langsung dari dasbor dengan enkripsi Bcrypt.
 - **Agenda Pasien Hari Ini (*Today's Schedule Card*):** Kartu ringkasan interaktif di atas dasbor yang merangkum jadwal janji temu pasien hari ini secara kronologis jam praktik (16:00 - 21:00 WIB).
 - **Hapus Data Pasien & Reset Antrean Uji (*Data Management*):** Tombol hapus antrean individual dengan modal konfirmasi aman, serta opsi pembersihan data testing 1-klik yang dilindungi konfirmasi kata sandi admin.
@@ -53,6 +54,16 @@ Aplikasi web modern profil klinik dokter gigi dan sistem reservasi janji temu pa
   - *Analisis Keluhan Pasien:* Klasifikasi otomatis 6 kategori keluhan terbanyak (Sakit/Ngilu, Karang Gigi, Gigi Berlubang, Estetika/Bleaching, Gigi Patah/Goyang, dan Cabut Gigi).
   - *Peringkat Tindakan Medis:* Grafik tindakan medis paling sering dilakukan beserta total nominal pendapatan.
 - **Kontrol Pengaturan Klinik:** Admin dapat menyetel mode *Otomatis (Ikuti Jam Praktik)* atau *Paksa Tutup (Cuti Libur)* serta memasang teks banner pengumuman darurat.
+
+### 4. Arsitektur Pertahanan Keamanan Siber (*Defense-in-Depth*)
+Sistem web menerapkan standar keamanan OWASP Top 10 dan standar perlindungan data kesehatan:
+1. **Edge Middleware Route Guard (`src/middleware.js`):** Memverifikasi tiket JWT di serverless edge sebelum halaman dasbor dikirim (Zero UI Flash).
+2. **Proteksi CSV/Formula Injection (CWE-1236):** Sanitasi otomatis simbol rumus Excel (`=`, `+`, `-`, `@`) pada generator laporan `.xlsx`.
+3. **Sanitasi Stored XSS:** Pembersihan script, style, dan tag HTML berbahaya pada modul `src/lib/sanitize.js`.
+4. **Honeypot Bot Trap:** Kolom tersembunyi untuk menjebak bot spam otomatis dengan respon *Silent Drop* (tanpa membuang kuota database).
+5. **Proteksi CSRF (Origin & Referer Guard):** Edge middleware memverifikasi kecocokan origin pada semua mutasi data admin (`POST`, `PUT`, `PATCH`, `DELETE`).
+6. **HTTP Security Headers Lengkap:** Strict-Transport-Security (HSTS 2 Tahun Preload), Content-Security-Policy (CSP), COOP, X-Frame-Options, dan X-Content-Type-Options.
+7. **Panduan Lengkap Pengujian Keamanan:** Tersedia pada dokumen khusus [**PANDUAN_PENGUJIAN_KEAMANAN.md**](./PANDUAN_PENGUJIAN_KEAMANAN.md).
 
 ---
 
@@ -172,58 +183,66 @@ npm run build
 ```text
 web-klinik-gigi/
 ├── e2e/                                # Pengujian Otomatis End-to-End (Playwright)
-│   └── klinik.spec.js
+│   ├── klinik.spec.js                  # Uji alur pasien, login admin, dan dashboard
+│   └── security.spec.js                # Uji XSS, formula injection, bot trap, CSRF, & audit log
 ├── prisma/                             # Skema ORM & Seeder Basis Data
-│   ├── schema.prisma                   # Model: Admin, Appointment, ClinicSetting, RateLimit
+│   ├── schema.prisma                   # Model: Admin, Appointment, ClinicSetting, RateLimit, SecurityAuditLog
 │   └── seed.js                         # Seeder akun admin & data awal klinik
 ├── public/                             # Aset Statis & Verifikasi Google
 │   └── googledfe8476829535dd7.html     # File verifikasi Google Search Console
 ├── src/
+│   ├── middleware.js                   # Edge Middleware (Route Guard & CSRF Origin Protection)
 │   ├── app/
 │   │   ├── admin/                      # Portal Admin
 │   │   │   ├── dashboard/              # Halaman dasbor operasional admin
 │   │   │   └── login/                  # Halaman masuk admin aman
 │   │   ├── api/                        # REST API Next.js Route Handlers
-│   │   │   ├── admin/                  # API data janji, ekspor excel, auth, & SSE stream
+│   │   │   ├── admin/                  # API data janji, ekspor excel, auth, audit-logs, & SSE stream
 │   │   │   ├── appointments/           # API pendaftaran pasien & konfirmasi kehadiran
 │   │   │   └── clinic-settings/        # API pengaturan jam operasional
 │   │   ├── konfirmasi/[token]/         # Halaman publik persetujuan jadwal pasien
 │   │   ├── globals.css                 # Styling Tailwind CSS & keyframe animasi
-│   │   ├── layout.js                   # Root layout, meta SEO Jember, & JSON-LD
+│   │   ├── layout.js                   # Root layout, Plus Jakarta Sans, SEO Jember, & JSON-LD
 │   │   ├── page.js                     # Controller utama landing page & form pasien
 │   │   ├── robots.js                   # Generator robots.txt otomatis
 │   │   └── sitemap.js                  # Generator sitemap.xml standar Google
 │   ├── components/
 │   │   ├── admin/                      # Komponen Modular Dasbor Admin
-│   │   │   ├── modals/                 # Modal Export, Pasien Manual, Invoice, Detail, dll.
+│   │   │   ├── modals/                 # Modal Export, Pasien Manual, Invoice, Detail, Delete, Settings
 │   │   │   ├── AnalyticsSection.js     # Grafik statistik keluhan & pendapatan tindakan
 │   │   │   ├── AppointmentTable.js     # Tabel antrean pasien & aksi WhatsApp
 │   │   │   ├── FilterBar.js            # Tab status, pencarian, & filter tanggal
 │   │   │   ├── HeaderNav.js            # Navbar admin, toggle suara, & profil
 │   │   │   ├── RealtimeToast.js        # Floating toast notifikasi pasien baru
-│   │   │   └── StatsGrid.js            # Kartu ringkasan metrik pasien
+│   │   │   ├── StatsGrid.js            # Kartu ringkasan metrik pasien
+│   │   │   └── TodayAgendaCard.js      # Agenda kronologis pasien hari ini
 │   │   ├── landing/                    # Komponen Modular Landing Page Publik
+│   │   │   ├── FaqSection.js           # Accordion tanya-jawab pasien
 │   │   │   ├── FooterSection.js        # Footer klinik & kontak
 │   │   │   ├── HeroSection.js          # Hero banner klinik gigi Jember
 │   │   │   ├── JsonLd.js               # Schema.org Dentist structured data
 │   │   │   ├── LocationSection.js      # Peta Google Maps resmi & rute lokasi
 │   │   │   ├── Navbar.js               # Navigasi publik & status klinik real-time
 │   │   │   ├── ScheduleSection.js      # Tabel jam operasional & logika buka/tutup
-│   │   │   ├── ServicesSection.js      # 6 Kartu layanan spesialis gigi
-│   │   │   ├── TestimonialsSection.js  # Ulasan & kepuasan pasien
+│   │   │   ├── ServicesSection.js      # 6 Kartu layanan spesialis gigi Dribbble style
+│   │   │   ├── TestimonialsSection.js  # Ulasan asli Google Maps 5.0 bintang
 │   │   │   └── WhyUsSection.js         # Kartu keunggulan & statistik klinik
 │   │   ├── patient/                    # Komponen Alur Pendaftaran Pasien
-│   │   │   ├── PatientForm.js          # Formulir input data konsultasi
+│   │   │   ├── PatientForm.js          # Formulir input data konsultasi & honeypot bot trap
 │   │   │   ├── StepGuide.js            # Panduan alur pendaftaran 3 langkah
 │   │   │   └── SuccessModal.js         # Modal notifikasi berhasil submit
 │   │   └── ui/
+│   │       ├── FloatingWhatsApp.js     # Tombol chat WhatsApp mengambang
 │   │       └── ScrollReveal.js         # Komponen animasi fade-in scroll seamless
 │   └── lib/                            # Modul Helper & Utilitas
-│       ├── auth.js                     # Otentikasi sesi cookie JWT & Bcrypt
+│       ├── audit.js                    # Helper Security Audit Trail PostgreSQL
+│       ├── auth.js                     # Otentikasi sesi JWT, single session token, & Bcrypt
 │       ├── clinicSchedule.js           # Logika waktu operasional WIB (Asia/Jakarta)
 │       ├── events.js                   # Real-time Event Bus (SSE Stream)
 │       ├── prisma.js                   # Prisma Client singleton
-│       └── rate-limiter.js             # Proteksi Anti-Spam (IP & No. HP)
+│       ├── rate-limiter.js             # Proteksi Anti-Spam (IP & No. HP)
+│       └── sanitize.js                 # Sanitasi XSS & Formula Injection Excel
+├── PANDUAN_PENGUJIAN_KEAMANAN.md       # Panduan langkah-langkah pengujian manual keamanan
 ├── .env.example                        # Contoh berkas konfigurasi environment
 ├── package.json                        # Paket dependensi proyek
 ├── playwright.config.js                # Konfigurasi pengujian Playwright

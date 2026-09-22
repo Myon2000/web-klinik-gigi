@@ -58,8 +58,17 @@ export async function middleware(request) {
     }
   }
 
-  // 2. Jika mengakses halaman login tetapi sudah login -> alihkan langsung ke dashboard
+  // 2. Jika mengakses halaman login
   if (pathname === '/admin/login') {
+    const reason = request.nextUrl.searchParams.get('reason');
+    if (reason) {
+      // Jika dialihkan karena sesi berakhir (single-session atau inactivity):
+      // Hapus cookie sesi basi seketika dan izinkan halaman login terbuka dengan pemberitahuan
+      const response = NextResponse.next();
+      response.cookies.delete('admin_token');
+      return response;
+    }
+
     if (isAuthenticated) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }

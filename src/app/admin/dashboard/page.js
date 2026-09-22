@@ -44,6 +44,14 @@ export default function AdminDashboard() {
   const [patientDetailModal, setPatientDetailModal] = useState({ open: false, appointment: null });
   const [deleteModal, setDeleteModal] = useState({ open: false, appointment: null, loading: false });
 
+  // Handler pengalihan saat sesi tidak sah (Single Session kick atau Sesi Kadaluarsa)
+  const handleUnauthorized = useCallback(async (reason = "single-session") => {
+    try {
+      await fetch("/api/admin/auth/logout", { method: "POST" });
+    } catch {}
+    router.push(`/admin/login?reason=${reason}`);
+  }, [router]);
+
   // Inactivity Auto-Logout (15 Menit)
   useEffect(() => {
     let timeoutId;
@@ -51,11 +59,8 @@ export default function AdminDashboard() {
 
     const resetTimer = () => {
       if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(async () => {
-        try {
-          await fetch("/api/admin/auth/logout", { method: "POST" });
-        } catch {}
-        router.push("/admin/login?reason=inactivity");
+      timeoutId = setTimeout(() => {
+        handleUnauthorized("inactivity");
       }, INACTIVITY_LIMIT);
     };
 
@@ -68,7 +73,30 @@ export default function AdminDashboard() {
       if (timeoutId) clearTimeout(timeoutId);
       activityEvents.forEach((ev) => window.removeEventListener(ev, resetTimer));
     };
-  }, [router]);
+  }, [handleUnauthorized]);
+
+  // Heartbeat & Window Focus Session Validation (Single Sign-On Protection)
+  useEffect(() => {
+    const verifySession = async () => {
+      try {
+        const res = await fetch("/api/admin/auth/me");
+        if (res.status === 401) {
+          handleUnauthorized("single-session");
+        }
+      } catch {}
+    };
+
+    // Validasi saat tab laptop difokuskan kembali setelah pengguna memakai HP
+    window.addEventListener("focus", verifySession);
+
+    // Heartbeat berkala tiap 10 detik
+    const heartbeat = setInterval(verifySession, 10000);
+
+    return () => {
+      window.removeEventListener("focus", verifySession);
+      clearInterval(heartbeat);
+    };
+  }, [handleUnauthorized]);
 
   // Status & Notifikasi Realtime
   const [feedback, setFeedback] = useState({ message: "", type: "" });
@@ -105,7 +133,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch("/api/admin/appointments");
       if (res.status === 401) {
-        router.push("/admin/login");
+        handleUnauthorized("single-session");
         return;
       }
       const json = await res.json();
@@ -117,12 +145,16 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [handleUnauthorized]);
 
   // 2. Fetch unread count for Red Dot Notification
   const fetchUnreadCount = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/unread-count");
+      if (res.status === 401) {
+        handleUnauthorized("single-session");
+        return;
+      }
       if (res.ok) {
         const json = await res.json();
         if (json.success) {
@@ -132,7 +164,7 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error("Gagal memuat status belum dibaca:", err);
     }
-  }, []);
+  }, [handleUnauthorized]);
 
   // 3. Fetch Clinic Settings
   const fetchClinicSettings = useCallback(async () => {
@@ -187,7 +219,17 @@ export default function AdminDashboard() {
       eventSource.onerror = () => {
         setIsConnected(false);
         eventSource.close();
-        reconnectTimeout = setTimeout(connectSSE, 5000);
+        fetch("/api/admin/auth/me")
+          .then((res) => {
+            if (res.status === 401) {
+              handleUnauthorized("single-session");
+            } else {
+              reconnectTimeout = setTimeout(connectSSE, 5000);
+            }
+          })
+          .catch(() => {
+            reconnectTimeout = setTimeout(connectSSE, 5000);
+          });
       };
     };
 
@@ -197,7 +239,7 @@ export default function AdminDashboard() {
       if (eventSource) eventSource.close();
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
     };
-  }, [fetchAppointments, fetchUnreadCount, playNotificationSound]);
+  }, [fetchAppointments, fetchUnreadCount, playNotificationSound, handleUnauthorized]);
 
   // Auto-dismiss realtime toast setelah 8 detik
   useEffect(() => {
@@ -234,10 +276,10 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     try {
       await fetch("/api/admin/auth/logout", { method: "POST" });
-      router.push("/admin/login");
-      router.refresh();
     } catch (err) {
       console.error("Logout error:", err);
+    } finally {
+      router.push("/admin/login");
     }
   };
 
@@ -252,6 +294,10 @@ export default function AdminDashboard() {
       const res = await fetch(`/api/admin/appointments/${id}`, {
         method: "DELETE",
       });
+      if (res.status === 401) {
+        handleUnauthorized("single-session");
+        return;
+      }
       const json = await res.json();
       if (res.ok && json.success) {
         setAppointments((prev) => prev.filter((a) => a.id !== id));
@@ -268,6 +314,7 @@ export default function AdminDashboard() {
       setDeleteModal((prev) => ({ ...prev, loading: false }));
     }
   };
+
   const handleCancelAppointment = async (item) => {
     const confirmed = window.confirm(`Apakah Anda yakin ingin menandai antrean pasien "${item.nama}" sebagai BATAL?`);
     if (!confirmed) return;
@@ -278,6 +325,10 @@ export default function AdminDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "BATAL", isRead: true }),
       });
+      if (res.status === 401) {
+        handleUnauthorized("single-session");
+        return;
+      }
       const json = await res.json();
       if (res.ok && json.success) {
         fetchAppointments();

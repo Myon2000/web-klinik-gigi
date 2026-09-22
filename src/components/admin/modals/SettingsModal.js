@@ -62,11 +62,12 @@ export default function SettingsModal({
     }
   };
 
-  useEffect(() => {
-    if (open && activeTab === "audit") {
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === "audit") {
       fetchAuditLogs();
     }
-  }, [open, activeTab]);
+  };
 
   if (!open) return null;
 
@@ -198,7 +199,7 @@ export default function SettingsModal({
         <div className="flex border-b border-slate-200 bg-slate-50/70 px-4 pt-2 gap-1 text-xs overflow-x-auto">
           <button
             type="button"
-            onClick={() => setActiveTab("operational")}
+            onClick={() => handleTabChange("operational")}
             className={`flex items-center gap-1.5 px-3.5 py-2.5 font-semibold rounded-t-lg border-b-2 transition-colors cursor-pointer shrink-0 ${
               activeTab === "operational"
                 ? "bg-white border-blue-600 text-blue-700 shadow-2xs"
@@ -211,7 +212,7 @@ export default function SettingsModal({
 
           <button
             type="button"
-            onClick={() => setActiveTab("security")}
+            onClick={() => handleTabChange("security")}
             className={`flex items-center gap-1.5 px-3.5 py-2.5 font-semibold rounded-t-lg border-b-2 transition-colors cursor-pointer shrink-0 ${
               activeTab === "security"
                 ? "bg-white border-blue-600 text-blue-700 shadow-2xs"
@@ -224,7 +225,7 @@ export default function SettingsModal({
 
           <button
             type="button"
-            onClick={() => setActiveTab("data")}
+            onClick={() => handleTabChange("data")}
             className={`flex items-center gap-1.5 px-3.5 py-2.5 font-semibold rounded-t-lg border-b-2 transition-colors cursor-pointer shrink-0 ${
               activeTab === "data"
                 ? "bg-white border-rose-600 text-rose-700 shadow-2xs"
@@ -237,7 +238,7 @@ export default function SettingsModal({
 
           <button
             type="button"
-            onClick={() => setActiveTab("audit")}
+            onClick={() => handleTabChange("audit")}
             className={`flex items-center gap-1.5 px-3.5 py-2.5 font-semibold rounded-t-lg border-b-2 transition-colors cursor-pointer shrink-0 ${
               activeTab === "audit"
                 ? "bg-white border-blue-600 text-blue-700 shadow-2xs"

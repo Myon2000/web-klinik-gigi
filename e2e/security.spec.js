@@ -121,4 +121,25 @@ test.describe('Security Utilities - Unit & Logic Verification', () => {
     );
     expect(hasFailedAttempt).toBe(true);
   });
+
+  test('8. Pengalihan SSO: saat dialihkan ke /admin/login?reason=single-session, middleware tidak melempar balik ke dashboard', async ({ page }) => {
+    // 1. Login dulu
+    await page.goto('/admin/login');
+    await page.fill('input[type="text"]', 'admin');
+    await page.fill('input[type="password"]', 'admin123');
+    await page.click('button[type="submit"]');
+    await expect(page).toHaveURL(/.*\/admin\/dashboard/);
+
+    // 2. Navigasi ke /admin/login?reason=single-session
+    await page.goto('/admin/login?reason=single-session');
+
+    // 3. Pastikan tetap di halaman login (tidak terpental balik ke dashboard)
+    await expect(page).toHaveURL(/.*\/admin\/login\?reason=single-session/);
+    await expect(page.locator('text=/.*Akun Anda telah masuk di perangkat lain.*/')).toBeVisible();
+
+    // 4. Verifikasi bahwa cookie admin_token telah dihapus
+    const cookies = await page.context().cookies();
+    const tokenCookie = cookies.find((c) => c.name === 'admin_token');
+    expect(tokenCookie).toBeUndefined();
+  });
 });
