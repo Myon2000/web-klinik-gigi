@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAdminSession } from '@/lib/auth';
+import { getClientIp } from '@/lib/rate-limiter';
+import { logSecurityEvent } from '@/lib/audit';
 
 export async function PATCH(request, context) {
   try {
@@ -72,8 +74,24 @@ export async function DELETE(request, context) {
       return NextResponse.json({ error: 'ID tidak valid' }, { status: 400 });
     }
 
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: appointmentId },
+      select: { id: true, nama: true },
+    });
+
+    if (!appointment) {
+      return NextResponse.json({ error: 'Data jadwal tidak ditemukan.' }, { status: 404 });
+    }
+
     await prisma.appointment.delete({
       where: { id: appointmentId },
+    });
+
+    await logSecurityEvent({
+      action: 'DELETE_APPOINTMENT',
+      actor: session.username,
+      ip: getClientIp(request),
+      details: `Menghapus antrean pasien: ${appointment.nama} (ID: ${appointmentId})`,
     });
 
     return NextResponse.json({

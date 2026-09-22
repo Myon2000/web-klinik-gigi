@@ -83,4 +83,42 @@ test.describe('Security Utilities - Unit & Logic Verification', () => {
     const json = await res.json();
     expect(json.error).toContain('Null Origin');
   });
+
+  test('7. Sistem audit trail mencatat log keamanan login dan dapat diakses via API audit-logs', async ({ request, page }) => {
+    // 1. Coba login salah untuk memicu log LOGIN_FAILED
+    await request.post('/api/admin/auth/login', {
+      data: {
+        username: 'fake_auditor',
+        password: 'wrong_password',
+      },
+    });
+
+    // 2. Login resmi via page untuk mendapatkan session cookie
+    await page.goto('/admin/login');
+    await page.fill('input[type="text"]', 'admin');
+    await page.fill('input[type="password"]', 'admin123');
+    await page.click('button[type="submit"]');
+    await expect(page).toHaveURL(/.*\/admin\/dashboard/);
+
+    // 3. Verifikasi endpoint /api/admin/audit-logs
+    const cookies = await page.context().cookies();
+    const adminToken = cookies.find((c) => c.name === 'admin_token')?.value;
+
+    const auditRes = await request.get('/api/admin/audit-logs', {
+      headers: {
+        Cookie: `admin_token=${adminToken}`,
+      },
+    });
+
+    expect(auditRes.status()).toBe(200);
+    const auditData = await auditRes.json();
+    expect(auditData.success).toBe(true);
+    expect(Array.isArray(auditData.data)).toBe(true);
+    expect(auditData.data.length).toBeGreaterThan(0);
+
+    const hasFailedAttempt = auditData.data.some(
+      (log) => log.action === 'LOGIN_FAILED' && log.actor === 'fake_auditor'
+    );
+    expect(hasFailedAttempt).toBe(true);
+  });
 });

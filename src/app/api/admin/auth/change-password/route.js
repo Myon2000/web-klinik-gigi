@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { getAdminSession, createAdminToken, generateSessionToken } from '@/lib/auth';
+import { getClientIp } from '@/lib/rate-limiter';
+import { logSecurityEvent } from '@/lib/audit';
 
 export async function POST(request) {
   try {
@@ -37,6 +39,12 @@ export async function POST(request) {
     // Verifikasi password lama
     const isOldMatch = await bcrypt.compare(String(oldPassword), admin.password);
     if (!isOldMatch) {
+      await logSecurityEvent({
+        action: 'PASSWORD_CHANGE_FAILED',
+        actor: admin.username,
+        ip: getClientIp(request),
+        details: 'Gagal verifikasi kata sandi lama',
+      });
       return NextResponse.json({ error: 'Kata sandi saat ini (lama) tidak benar.' }, { status: 400 });
     }
 
@@ -64,6 +72,13 @@ export async function POST(request) {
         password: hashedPassword,
         sessionToken: newSessionToken,
       },
+    });
+
+    await logSecurityEvent({
+      action: 'PASSWORD_CHANGED',
+      actor: updatedUsername,
+      ip: getClientIp(request),
+      details: 'Kata sandi berhasil diperbarui, seluruh sesi lain di-reset',
     });
 
     // Buat token sesi baru untuk sesi lokal saat ini

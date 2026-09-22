@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { getAdminSession } from '@/lib/auth';
+import { getClientIp } from '@/lib/rate-limiter';
+import { logSecurityEvent } from '@/lib/audit';
 
 export async function POST(request) {
   try {
@@ -31,6 +33,12 @@ export async function POST(request) {
 
     const isMatch = await bcrypt.compare(String(password), admin.password);
     if (!isMatch) {
+      await logSecurityEvent({
+        action: 'RESET_TEST_DATA_FAILED',
+        actor: admin.username,
+        ip: getClientIp(request),
+        details: 'Gagal konfirmasi kata sandi untuk reset data',
+      });
       return NextResponse.json({ error: 'Kata sandi yang Anda masukkan salah.' }, { status: 401 });
     }
 
@@ -47,6 +55,13 @@ export async function POST(request) {
       });
       await prisma.rateLimit.deleteMany({});
     }
+
+    await logSecurityEvent({
+      action: 'RESET_TEST_DATA',
+      actor: admin.username,
+      ip: getClientIp(request),
+      details: mode === 'ALL' ? 'Bersih total antrean pasien (ID reset ke 1)' : 'Hanya membersihkan pasien selesai & batal',
+    });
 
     return NextResponse.json({
       success: true,

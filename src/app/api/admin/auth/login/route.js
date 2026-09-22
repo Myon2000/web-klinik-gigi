@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { createAdminToken, generateSessionToken } from '@/lib/auth';
 import { getClientIp, isRateLimited, recordFailure, clearRateLimit } from '@/lib/rate-limiter';
+import { logSecurityEvent } from '@/lib/audit';
 
 // Hash dummy untuk mencegah timing attack jika username tidak ditemukan
 const DUMMY_HASH = '$2a$10$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNO1234567890123456';
@@ -43,6 +44,14 @@ export async function POST(request) {
       const failureCount = await recordFailure(rateLimitKey, 15);
       const remainingAttempts = Math.max(0, 5 - failureCount);
 
+      // Audit log kegagalan login
+      await logSecurityEvent({
+        action: 'LOGIN_FAILED',
+        actor: String(username).trim(),
+        ip: clientIp,
+        details: remainingAttempts > 0 ? `Gagal (Sisa percobaan: ${remainingAttempts})` : 'Percobaan habis / akun diblokir sementara',
+      });
+
       const warningText =
         remainingAttempts > 0
           ? `Username atau password salah. (Sisa percobaan: ${remainingAttempts})`
@@ -59,6 +68,14 @@ export async function POST(request) {
     await prisma.admin.update({
       where: { id: admin.id },
       data: { sessionToken },
+    });
+
+    // Audit log keberhasilan login
+    await logSecurityEvent({
+      action: 'LOGIN_SUCCESS',
+      actor: admin.username,
+      ip: clientIp,
+      details: 'Sesi aktif tunggal diterbitkan',
     });
 
     const token = await createAdminToken({
