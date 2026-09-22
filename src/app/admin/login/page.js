@@ -12,6 +12,8 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockoutMinutes, setLockoutMinutes] = useState(15);
 
   const reason = searchParams.get("reason");
   const infoNotice =
@@ -38,6 +40,10 @@ function LoginForm() {
         router.push("/admin/dashboard");
         router.refresh();
       } else {
+        if (res.status === 429 || data.isLocked) {
+          setIsLocked(true);
+          setLockoutMinutes(data.remainingMinutes || 15);
+        }
         setError(data.error || "Username atau password salah.");
       }
     } catch (err) {
@@ -87,8 +93,9 @@ function LoginForm() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                disabled={loading || isLocked}
                 placeholder="Masukkan username"
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -106,21 +113,31 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={loading || isLocked}
                 placeholder="Masukkan kata sandi"
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-md shadow-blue-200 transition-all cursor-pointer disabled:opacity-50 mt-4"
+            disabled={loading || isLocked}
+            className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold transition-all mt-4 ${
+              isLocked
+                ? "bg-slate-200 text-slate-500 border border-slate-300 cursor-not-allowed shadow-none"
+                : "text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-md shadow-blue-200 cursor-pointer disabled:opacity-50"
+            }`}
           >
             {loading ? (
               <>
                 <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                 <span>Memeriksa...</span>
+              </>
+            ) : isLocked ? (
+              <>
+                <Lock className="w-4 h-4 text-slate-500" />
+                <span>Akses Terkunci ({lockoutMinutes} Menit)</span>
               </>
             ) : (
               <span>Masuk ke Dashboard</span>

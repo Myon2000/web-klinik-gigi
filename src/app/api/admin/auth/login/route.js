@@ -19,6 +19,8 @@ export async function POST(request) {
       return NextResponse.json(
         {
           error: `Terlalu banyak percobaan login yang gagal. Akses dibatasi selama ${rateCheck.remainingMinutes} menit untuk keamanan.`,
+          isLocked: true,
+          remainingMinutes: rateCheck.remainingMinutes,
         },
         { status: 429 }
       );
@@ -52,12 +54,24 @@ export async function POST(request) {
         details: remainingAttempts > 0 ? `Gagal (Sisa percobaan: ${remainingAttempts})` : 'Percobaan habis / akun diblokir sementara',
       });
 
-      const warningText =
-        remainingAttempts > 0
-          ? `Username atau password salah. (Sisa percobaan: ${remainingAttempts})`
-          : 'Terlalu banyak percobaan login gagal. Akun dibatasi sementara.';
+      if (remainingAttempts === 0) {
+        return NextResponse.json(
+          {
+            error: 'Terlalu banyak percobaan login gagal. Akses dibatasi selama 15 menit untuk keamanan.',
+            isLocked: true,
+            remainingMinutes: 15,
+          },
+          { status: 429 }
+        );
+      }
 
-      return NextResponse.json({ error: warningText }, { status: 401 });
+      return NextResponse.json(
+        {
+          error: `Username atau password salah. (Sisa percobaan: ${remainingAttempts})`,
+          remainingAttempts,
+        },
+        { status: 401 }
+      );
     }
 
     // 2. Jika login berhasil, bersihkan catatan kegagalan rate limit
