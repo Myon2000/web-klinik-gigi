@@ -67,4 +67,10 @@ test.describe('Klinik Gigi - E2E Testing Suite', () => {
     await expect(page.locator('button:has-text("Pasien Manual")')).toBeVisible();
     await expect(page.locator('button:has-text("Ekspor Excel")')).toBeVisible();
   });
+
+  test('4. Akses langsung ke /admin/dashboard tanpa login dialihkan oleh middleware ke /admin/login', async ({ page }) => {
+    await page.goto('/admin/dashboard');
+    await expect(page).toHaveURL(/.*\/admin\/login/);
+    await expect(page.getByRole('heading', { name: 'Portal Masuk Admin' })).toBeVisible();
+  });
 });
