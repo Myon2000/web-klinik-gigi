@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { sanitizeText, sanitizeExcelCell } from '../src/lib/sanitize';
+import { ADMIN_USERNAME, ADMIN_PASSWORD } from './auth.config';
 
 test.describe('Security Utilities - Unit & Logic Verification', () => {
   test('1. sanitizeText membersihkan script dan tag HTML berbahaya (Stored XSS)', () => {
@@ -124,8 +125,8 @@ test.describe('Security Utilities - Unit & Logic Verification', () => {
 
     // 2. Login resmi via page untuk mendapatkan session cookie
     await page.goto('/admin/login');
-    await page.fill('input[type="text"]', 'admin');
-    await page.fill('input[type="password"]', 'admin123');
+    await page.fill('input[type="text"]', ADMIN_USERNAME);
+    await page.fill('input[type="password"]', ADMIN_PASSWORD);
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL(/.*\/admin\/dashboard/);
 
@@ -154,8 +155,8 @@ test.describe('Security Utilities - Unit & Logic Verification', () => {
   test('8. Pengalihan SSO: saat dialihkan ke /admin/login?reason=single-session, middleware tidak melempar balik ke dashboard', async ({ page }) => {
     // 1. Login dulu
     await page.goto('/admin/login');
-    await page.fill('input[type="text"]', 'admin');
-    await page.fill('input[type="password"]', 'admin123');
+    await page.fill('input[type="text"]', ADMIN_USERNAME);
+    await page.fill('input[type="password"]', ADMIN_PASSWORD);
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL(/.*\/admin\/dashboard/);
 

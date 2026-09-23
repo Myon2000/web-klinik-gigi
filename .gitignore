@@ -44,6 +44,8 @@ Thumbs.db
 desktop.ini
 *.pem
 PANDUAN_PENGUJIAN_KEAMANAN.md
+CATATAN_KREDENSIAL_ADMIN.local.md
+*.local.md
 
 # Debug Logs
 npm-debug.log*

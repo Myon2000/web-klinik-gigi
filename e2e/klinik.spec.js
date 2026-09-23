@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { ADMIN_USERNAME, ADMIN_PASSWORD } from './auth.config';
 
 test.describe('Klinik Gigi - E2E Testing Suite', () => {
   test('1. Pasien dapat mengakses halaman pendaftaran dan mengirim data konsultasi', async ({ page }) => {
@@ -35,14 +36,14 @@ test.describe('Klinik Gigi - E2E Testing Suite', () => {
     await expect(page.getByRole('heading', { name: 'Portal Masuk Admin' })).toBeVisible();
 
     // Uji dengan password salah
-    await page.fill('input[type="text"]', 'admin');
+    await page.fill('input[type="text"]', ADMIN_USERNAME);
     await page.fill('input[type="password"]', 'passwordsalah123');
     await page.click('button[type="submit"]');
 
     await expect(page.locator('text=/.*Username atau password salah.*/')).toBeVisible({ timeout: 15000 });
 
-    // Uji dengan password benar (default PKL: admin123)
-    await page.fill('input[type="password"]', 'admin123');
+    // Uji dengan password benar
+    await page.fill('input[type="password"]', ADMIN_PASSWORD);
     await page.click('button[type="submit"]');
 
     // Menunggu pengalihan ke dashboard
@@ -53,8 +54,8 @@ test.describe('Klinik Gigi - E2E Testing Suite', () => {
   test('3. Dashboard admin menampilkan ringkasan statistik dan tombol tindakan', async ({ page }) => {
     // Login terlebih dahulu
     await page.goto('/admin/login');
-    await page.fill('input[type="text"]', 'admin');
-    await page.fill('input[type="password"]', 'admin123');
+    await page.fill('input[type="text"]', ADMIN_USERNAME);
+    await page.fill('input[type="password"]', ADMIN_PASSWORD);
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL(/.*\/admin\/dashboard/, { timeout: 15000 });
 

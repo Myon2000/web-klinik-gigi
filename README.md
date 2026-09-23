@@ -56,14 +56,14 @@ Aplikasi web modern profil klinik dokter gigi dan sistem reservasi janji temu pa
 - **Kontrol Pengaturan Klinik:** Admin dapat menyetel mode *Otomatis (Ikuti Jam Praktik)* atau *Paksa Tutup (Cuti Libur)* serta memasang teks banner pengumuman darurat.
 
 ### 4. Arsitektur Pertahanan Keamanan Siber (*Defense-in-Depth*)
-Sistem web menerapkan standar keamanan OWASP Top 10 dan standar perlindungan data kesehatan:
-1. **Edge Middleware Route Guard (`src/middleware.js`):** Memverifikasi tiket JWT di serverless edge sebelum halaman dasbor dikirim (Zero UI Flash).
-2. **Proteksi CSV/Formula Injection (CWE-1236):** Sanitasi otomatis simbol rumus Excel (`=`, `+`, `-`, `@`) pada generator laporan `.xlsx`.
-3. **Sanitasi Stored XSS:** Pembersihan script, style, dan tag HTML berbahaya pada modul `src/lib/sanitize.js`.
-4. **Honeypot Bot Trap:** Kolom tersembunyi untuk menjebak bot spam otomatis dengan respon *Silent Drop* (tanpa membuang kuota database).
-5. **Proteksi CSRF (Origin & Referer Guard):** Edge middleware memverifikasi kecocokan origin pada semua mutasi data admin (`POST`, `PUT`, `PATCH`, `DELETE`).
-6. **HTTP Security Headers Lengkap:** Strict-Transport-Security (HSTS 2 Tahun Preload), Content-Security-Policy (CSP), COOP, X-Frame-Options, dan X-Content-Type-Options.
-7. **Pengujian Keamanan Otomatis:** Dilengkapi skenario uji otomatis Playwright (`e2e/security.spec.js`) yang memvalidasi XSS, Formula Injection, Honeypot, CSRF, dan Audit Log.
+Sistem web menerapkan standar keamanan OWASP Top 10 dan prinsip perlindungan data kesehatan:
+1. **Edge Middleware Route Guard:** Memverifikasi sesi JWT di lapisan serverless edge sebelum halaman dasbor dikirim (Zero UI Flash).
+2. **Proteksi CSV/Formula Injection (CWE-1236):** Sanitasi otomatis karakter formula spreadsheet (`=`, `+`, `-`, `@`) pada generator laporan `.xlsx`.
+3. **Sanitasi Stored XSS:** Penyaringan script dan tag HTML berbahaya pada modul sanitasi data pengguna.
+4. **Honeypot Bot Defense:** Mekanisme deteksi otomatis pada formulir pendaftaran untuk menjebak bot spammer tanpa membebani database (*Silent Drop*).
+5. **Proteksi CSRF (Cross-Site Request Forgery):** Verifikasi kecocokan domain (*Origin & Referer Guard*) pada seluruh mutasi data admin (`POST`, `PUT`, `PATCH`, `DELETE`).
+6. **HTTP Security Headers Lengkap:** Strict-Transport-Security (HSTS Preload), Content-Security-Policy (CSP), Cross-Origin-Opener-Policy (COOP), X-Frame-Options, dan X-Content-Type-Options.
+7. **Pengujian Keamanan Otomatis:** Dilengkapi skenario uji otomatis Playwright (`e2e/security.spec.js`) yang memvalidasi ketahanan XSS, Formula Injection, Honeypot, CSRF, dan Audit Log.
 
 ---
 
@@ -134,10 +134,12 @@ Jalankan seeder untuk mengisi akun admin default dan data pengaturan awal:
 npx prisma db seed
 ```
 
-> **Kredensial Default Admin (Lingkungan Uji PKL):**
+> **Kredensial Bawaan Seeder (Khusus Lingkungan Pengembangan Lokal):**
 > - **URL Login Admin:** `http://localhost:3000/admin/login`
 > - **Username:** `admin`
 > - **Password:** `admin123`
+>
+> *Catatan Keamanan: Kredensial di atas hanya berlaku untuk instalasi awal database lokal baru (`prisma db seed`). Untuk lingkungan produksi, kredensial login wajib dan telah diubah secara mandiri melalui menu Pengaturan demi menjaga kerahasiaan data pasien.*
 
 ### 5. Menjalankan Server Pengembangan
 ```bash
@@ -183,6 +185,7 @@ npm run build
 ```text
 web-klinik-gigi/
 ├── e2e/                                # Pengujian Otomatis End-to-End (Playwright)
+│   ├── auth.config.js                  # Konfigurasi autentikasi test runner (env-aware)
 │   ├── klinik.spec.js                  # Uji alur pasien, login admin, dan dashboard
 │   └── security.spec.js                # Uji XSS, formula injection, bot trap, CSRF, & audit log
 ├── prisma/                             # Skema ORM & Seeder Basis Data
