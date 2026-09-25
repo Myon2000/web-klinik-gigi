@@ -1,14 +1,14 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import { CalendarCheck2 } from "lucide-react";
 
 export default function StepGuide() {
   return (
     <>
       {/* Hero Section */}
       <div className="text-center max-w-2xl mx-auto mb-10">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/60 mb-3">
-          <Sparkles className="w-3.5 h-3.5" /> Pelayanan Kesehatan Gigi Ramah & Profesional
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/60 mb-3 shadow-2xs">
+          <CalendarCheck2 className="w-3.5 h-3.5 text-blue-600" /> Pelayanan Kesehatan Gigi Ramah & Profesional
         </span>
         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
           Buat Janji Konsultasi Gigi Tanpa Ribet

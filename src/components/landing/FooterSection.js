@@ -1,9 +1,15 @@
 "use client";
 
-import { Stethoscope, MapPin, Phone, Clock, Mail, ShieldCheck } from "lucide-react";
+import { Stethoscope, MapPin, Phone, Clock, ShieldCheck, ArrowUp } from "lucide-react";
 
 export default function FooterSection() {
   const currentYear = new Date().getFullYear();
+
+  const scrollToTop = () => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-12 border-t border-slate-800">
@@ -26,7 +32,7 @@ export default function FooterSection() {
             </p>
 
             <div className="flex items-center gap-2 text-xs text-slate-400 pt-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>Protokol Higienis & Peralatan Medis Terstandar</span>
             </div>
           </div>
@@ -58,6 +64,16 @@ export default function FooterSection() {
               <li>
                 <a href="#tentang" className="hover:text-white transition-colors">
                   Tentang Klinik Kami
+                </a>
+              </li>
+              <li>
+                <a href="#testimoni" className="hover:text-white transition-colors">
+                  Ulasan Pasien
+                </a>
+              </li>
+              <li>
+                <a href="#faq" className="hover:text-white transition-colors">
+                  Tanya Jawab (FAQ)
                 </a>
               </li>
               <li>
@@ -97,12 +113,24 @@ export default function FooterSection() {
           </div>
         </div>
 
-        {/* Bottom Copyright */}
-        <div className="pt-8 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© {currentYear} Klinik drg. Hetty Jember. Seluruh hak cipta dilindungi.</p>
-          <p className="text-[11px] text-slate-500">
-            Sistem Informasi & Pendaftaran Janji Temu Konsultasi Pasien
-          </p>
+        {/* Bottom Copyright & Back to Top */}
+        <div className="pt-8 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-center sm:text-left">
+            <p suppressHydrationWarning>© {currentYear} Klinik drg. Hetty Jember. Seluruh hak cipta dilindungi.</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              Sistem Informasi & Pendaftaran Janji Temu Konsultasi Pasien
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={scrollToTop}
+            aria-label="Kembali ke atas halaman"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 hover:text-white text-xs font-medium transition-colors cursor-pointer border border-slate-700/60"
+          >
+            <span>Kembali ke Atas</span>
+            <ArrowUp className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </footer>
