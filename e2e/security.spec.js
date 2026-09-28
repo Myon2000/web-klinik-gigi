@@ -190,4 +190,67 @@ test.describe('Security Utilities - Unit & Logic Verification', () => {
     const json = await res.json();
     expect(json.error).toContain('tidak boleh tanggal yang sudah lewat');
   });
+
+  test('10. Backend menolak input tindakan medis / status SELESAI jika pasien belum berstatus TERKONFIRMASI', async ({ request }) => {
+    // 1. Buat pasien pendaftaran baru via Web (status awal: MENUNGGU_JADWAL)
+    const uniquePhone = '0812' + Math.floor(10000000 + Math.random() * 90000000);
+    const createRes = await request.post('/api/appointments', {
+      data: {
+        nama: 'Pasien Uji Validasi Tindakan',
+        nomor_hp: uniquePhone,
+        tempat_lahir: 'Jember',
+        tanggal_lahir: '2000-05-15',
+        alamat: 'Jl. Kaliwates Jember',
+        keluhan: 'Gigi ngilu',
+      },
+    });
+    expect(createRes.status()).toBe(201);
+    const createdData = await createRes.json();
+    const apptId = createdData.data.id;
+
+    // 2. Login admin
+    const loginRes = await request.post('/api/admin/auth/login', {
+      data: {
+        username: ADMIN_USERNAME,
+        password: ADMIN_PASSWORD,
+      },
+    });
+    expect(loginRes.status()).toBe(200);
+
+    // 3. Upaya ilegal: Langsung input tindakan / set SELESAI saat status masih MENUNGGU_JADWAL
+    const illegalAttempt = await request.patch(`/api/admin/appointments/${apptId}`, {
+      data: {
+        tindakan: 'Tambal Komposit',
+        biaya: '200000',
+        status: 'SELESAI',
+      },
+    });
+    expect(illegalAttempt.status()).toBe(400);
+    const illegalJson = await illegalAttempt.json();
+    expect(illegalJson.error).toContain('Terkonfirmasi');
+
+    // 4. Ubah status menjadi TERKONFIRMASI (Alur yang sah)
+    const confirmRes = await request.patch(`/api/admin/appointments/${apptId}`, {
+      data: {
+        status: 'TERKONFIRMASI',
+      },
+    });
+    expect(confirmRes.status()).toBe(200);
+
+    // 5. Sekarang dokter menginput tindakan setelah terkonfirmasi -> Harus berhasil
+    const legalAttempt = await request.patch(`/api/admin/appointments/${apptId}`, {
+      data: {
+        tindakan: 'Tambal Komposit',
+        biaya: '200000',
+        status: 'SELESAI',
+      },
+    });
+    expect(legalAttempt.status()).toBe(200);
+    const legalJson = await legalAttempt.json();
+    expect(legalJson.data.status).toBe('SELESAI');
+    expect(legalJson.data.tindakan).toBe('Tambal Komposit');
+
+    // 6. Bersihkan data uji
+    await request.delete(`/api/admin/appointments/${apptId}`);
+  });
 });

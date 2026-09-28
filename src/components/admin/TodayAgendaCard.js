@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, Clock, ChevronDown, ChevronUp, UserCheck, Send, Stethoscope, CheckCircle2 } from "lucide-react";
+import { Calendar, Clock, ChevronDown, ChevronUp, UserCheck, Send, Stethoscope, CheckCircle2, Check } from "lucide-react";
 import { formatTanggal } from "@/lib/formatters";
 import { getWIBDate } from "@/lib/clinicSchedule";
 
@@ -10,6 +10,7 @@ export default function TodayAgendaCard({
   onOpenScheduleModal,
   onOpenTreatmentModal,
   onOpenPatientDetail,
+  onConfirmAppointment,
 }) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -133,6 +134,16 @@ export default function TodayAgendaCard({
                       </span>
 
                       <div className="flex items-center gap-1">
+                        {patient.status === "MENUNGGU_KONFIRMASI" && onConfirmAppointment && (
+                          <button
+                            type="button"
+                            onClick={() => onConfirmAppointment(patient)}
+                            className="p-1.5 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
+                            title="Tandai Hadir / Terkonfirmasi"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => onOpenScheduleModal?.(patient)}
@@ -141,14 +152,28 @@ export default function TodayAgendaCard({
                         >
                           <Send className="w-3.5 h-3.5" />
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => onOpenTreatmentModal?.(patient)}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
-                          title="Input Tindakan Medis"
-                        >
-                          <Stethoscope className="w-3.5 h-3.5" />
-                        </button>
+                        {(() => {
+                          const canInput = patient.status === "TERKONFIRMASI" || patient.status === "SELESAI";
+                          return (
+                            <button
+                              type="button"
+                              disabled={!canInput}
+                              onClick={() => canInput && onOpenTreatmentModal?.(patient)}
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                canInput
+                                  ? "text-slate-500 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
+                                  : "text-slate-300 cursor-not-allowed opacity-50"
+                              }`}
+                              title={
+                                canInput
+                                  ? "Input Tindakan Medis"
+                                  : "Pasien belum berstatus Terkonfirmasi"
+                              }
+                            >
+                              <Stethoscope className="w-3.5 h-3.5" />
+                            </button>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>

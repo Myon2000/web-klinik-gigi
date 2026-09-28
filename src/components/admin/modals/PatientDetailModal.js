@@ -1,9 +1,9 @@
 "use client";
 
-import { X, User, Phone, MapPin, FileText, Stethoscope, Send } from "lucide-react";
+import { X, User, Phone, MapPin, FileText, Stethoscope, Send, Check } from "lucide-react";
 import { formatTanggal, formatRupiah, calculateAge } from "@/lib/formatters";
 
-export default function PatientDetailModal({ open, appointment, onClose, onOpenSchedule, onOpenTreatment }) {
+export default function PatientDetailModal({ open, appointment, onClose, onOpenSchedule, onOpenTreatment, onConfirmAppointment }) {
   if (!open || !appointment) return null;
 
   const age = calculateAge(appointment.tanggalLahir);
@@ -129,7 +129,7 @@ export default function PatientDetailModal({ open, appointment, onClose, onOpenS
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2 shrink-0">
+        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2 shrink-0 flex-wrap">
           <button
             type="button"
             onClick={onClose}
@@ -137,6 +137,21 @@ export default function PatientDetailModal({ open, appointment, onClose, onOpenS
           >
             Tutup
           </button>
+
+          {appointment.status === "MENUNGGU_KONFIRMASI" && onConfirmAppointment && (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onConfirmAppointment(appointment);
+              }}
+              className="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-300 font-semibold flex items-center gap-1.5 cursor-pointer text-xs shadow-2xs"
+              title="Tandai pasien terkonfirmasi (jika pasien konfirmasi via chat WA / telepon)"
+            >
+              <Check className="w-3.5 h-3.5" />
+              <span>Konfirmasi Kehadiran</span>
+            </button>
+          )}
 
           <button
             type="button"
@@ -150,17 +165,35 @@ export default function PatientDetailModal({ open, appointment, onClose, onOpenS
             <span>Atur Jadwal / WA</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              onClose();
-              onOpenTreatment?.(appointment);
-            }}
-            className="px-3.5 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-semibold flex items-center gap-1.5 cursor-pointer text-xs shadow-xs"
-          >
-            <Stethoscope className="w-3.5 h-3.5" />
-            <span>Input Tindakan</span>
-          </button>
+          {(() => {
+            const canInputTreatment = appointment.status === "TERKONFIRMASI" || appointment.status === "SELESAI";
+            if (canInputTreatment) {
+              return (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenTreatment?.(appointment);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-semibold flex items-center gap-1.5 cursor-pointer text-xs shadow-xs"
+                >
+                  <Stethoscope className="w-3.5 h-3.5" />
+                  <span>Input Tindakan</span>
+                </button>
+              );
+            }
+            return (
+              <button
+                type="button"
+                disabled
+                className="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-400 border border-slate-200 font-semibold flex items-center gap-1.5 cursor-not-allowed text-xs"
+                title="Pasien harus berstatus 'Terkonfirmasi' terlebih dahulu"
+              >
+                <Stethoscope className="w-3.5 h-3.5" />
+                <span>Input Tindakan</span>
+              </button>
+            );
+          })()}
         </div>
       </div>
     </div>

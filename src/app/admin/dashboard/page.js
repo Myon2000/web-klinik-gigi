@@ -315,6 +315,34 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleConfirmAppointment = async (item) => {
+    try {
+      const res = await fetch(`/api/admin/appointments/${item.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "TERKONFIRMASI", isRead: true }),
+      });
+      if (res.status === 401) {
+        handleUnauthorized("single-session");
+        return;
+      }
+      const json = await res.json();
+      if (res.ok && json.success) {
+        fetchAppointments();
+        fetchUnreadCount();
+        setFeedback({
+          message: `Status pasien "${item.nama}" berhasil diubah menjadi Terkonfirmasi. Dokter sekarang dapat menginput tindakan medis.`,
+          type: "success",
+        });
+      } else {
+        setFeedback({ message: json.error || "Gagal mengonfirmasi pasien.", type: "error" });
+      }
+    } catch (err) {
+      console.error("Gagal konfirmasi pasien:", err);
+      setFeedback({ message: "Terjadi kesalahan saat mengonfirmasi pasien.", type: "error" });
+    }
+  };
+
   const handleCancelAppointment = async (item) => {
     const confirmed = window.confirm(`Apakah Anda yakin ingin menandai antrean pasien "${item.nama}" sebagai BATAL?`);
     if (!confirmed) return;
@@ -407,6 +435,7 @@ export default function AdminDashboard() {
           onOpenScheduleModal={(item) => setScheduleModal({ open: true, appointment: item })}
           onOpenTreatmentModal={(item) => setTreatmentModal({ open: true, appointment: item })}
           onOpenPatientDetail={(item) => setPatientDetailModal({ open: true, appointment: item })}
+          onConfirmAppointment={handleConfirmAppointment}
         />
 
         {/* 4. Kartu Ringkasan Statistik */}
@@ -437,6 +466,7 @@ export default function AdminDashboard() {
           onOpenTreatmentModal={(item) => setTreatmentModal({ open: true, appointment: item })}
           onOpenReceiptModal={(item) => setReceiptModal({ open: true, appointment: item })}
           onOpenPatientDetail={(item) => setPatientDetailModal({ open: true, appointment: item })}
+          onConfirmAppointment={handleConfirmAppointment}
           onCancelAppointment={handleCancelAppointment}
           onDeleteAppointment={handleDeleteAppointment}
           onResetFilter={() => {
@@ -502,6 +532,7 @@ export default function AdminDashboard() {
         onClose={() => setPatientDetailModal({ open: false, appointment: null })}
         onOpenSchedule={(item) => setScheduleModal({ open: true, appointment: item })}
         onOpenTreatment={(item) => setTreatmentModal({ open: true, appointment: item })}
+        onConfirmAppointment={handleConfirmAppointment}
       />
 
       <DeleteConfirmationModal

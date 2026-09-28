@@ -10,6 +10,7 @@ export default function AppointmentTable({
   onOpenTreatmentModal,
   onOpenReceiptModal,
   onOpenPatientDetail,
+  onConfirmAppointment,
   onCancelAppointment,
   onDeleteAppointment,
   onResetFilter,
@@ -211,58 +212,86 @@ export default function AppointmentTable({
 
                     {/* Actions */}
                     <td className="py-3.5 px-4 align-top text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => onOpenScheduleModal(item)}
-                          className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-white font-semibold transition-colors cursor-pointer text-xs shadow-xs ${
-                            isPendingSchedule
-                              ? "bg-emerald-600 hover:bg-emerald-700 ring-2 ring-emerald-200"
-                              : "bg-emerald-600 hover:bg-emerald-700"
-                          }`}
-                          title="Atur Jadwal & Kirim Pesan WhatsApp"
-                        >
-                          <Send className="w-3 h-3" />
-                          <span>Atur & WA</span>
-                        </button>
+                      {(() => {
+                        const canInputTreatment = item.status === "TERKONFIRMASI" || item.status === "SELESAI";
+                        return (
+                          <div className="flex items-center justify-end gap-1.5">
+                            {/* Tombol Atur Jadwal / WA */}
+                            <button
+                              onClick={() => onOpenScheduleModal(item)}
+                              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-white font-semibold transition-colors cursor-pointer text-xs shadow-xs ${
+                                isPendingSchedule
+                                  ? "bg-emerald-600 hover:bg-emerald-700 ring-2 ring-emerald-200"
+                                  : "bg-emerald-600 hover:bg-emerald-700"
+                              }`}
+                              title="Atur Jadwal & Kirim Pesan WhatsApp"
+                            >
+                              <Send className="w-3 h-3" />
+                              <span>Atur & WA</span>
+                            </button>
 
-                        <button
-                          onClick={() => onOpenTreatmentModal(item)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold border border-blue-200 transition-colors cursor-pointer text-xs"
-                          title="Input Tindakan & Tarif Biaya"
-                        >
-                          <Stethoscope className="w-3 h-3" />
-                          <span>Tindakan</span>
-                        </button>
+                            {/* Tombol Konfirmasi Cepat jika pasien konfirmasi lisan via WA / Telepon */}
+                            {item.status === "MENUNGGU_KONFIRMASI" && (
+                              <button
+                                onClick={() => onConfirmAppointment?.(item)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold border border-emerald-200 transition-colors cursor-pointer text-xs shadow-2xs"
+                                title="Tandai Pasien Terkonfirmasi (Pasien konfirmasi hadir via chat/telepon)"
+                              >
+                                <Check className="w-3 h-3" />
+                                <span>Konfirmasi</span>
+                              </button>
+                            )}
 
-                        {item.status === "SELESAI" && (
-                          <button
-                            onClick={() => onOpenReceiptModal(item)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold border border-slate-300 transition-colors cursor-pointer text-xs"
-                            title="Cetak Bukti Kunjungan / Nota Pembayaran"
-                          >
-                            <Printer className="w-3 h-3 text-slate-500" />
-                            <span>Nota</span>
-                          </button>
-                        )}
+                            {/* Tombol Tindakan Dokter: Hanya aktif jika status TERKONFIRMASI atau SELESAI */}
+                            <button
+                              onClick={() => canInputTreatment && onOpenTreatmentModal(item)}
+                              disabled={!canInputTreatment}
+                              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-semibold border transition-all text-xs ${
+                                canInputTreatment
+                                  ? "bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 cursor-pointer shadow-2xs"
+                                  : "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
+                              }`}
+                              title={
+                                canInputTreatment
+                                  ? "Input Tindakan & Tarif Biaya"
+                                  : "Pasien harus berstatus 'Terkonfirmasi' terlebih dahulu sebelum dapat ditangani"
+                              }
+                            >
+                              <Stethoscope className="w-3 h-3" />
+                              <span>Tindakan</span>
+                            </button>
 
-                        {item.status !== "SELESAI" && item.status !== "BATAL" && (
-                          <button
-                            onClick={() => onCancelAppointment?.(item)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 border border-transparent hover:border-amber-200 transition-colors cursor-pointer text-xs"
-                            title="Tandai Batal / Pasien Tidak Hadir"
-                          >
-                            <Ban className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                            {item.status === "SELESAI" && (
+                              <button
+                                onClick={() => onOpenReceiptModal(item)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold border border-slate-300 transition-colors cursor-pointer text-xs"
+                                title="Cetak Bukti Kunjungan / Nota Pembayaran"
+                              >
+                                <Printer className="w-3 h-3 text-slate-500" />
+                                <span>Nota</span>
+                              </button>
+                            )}
 
-                        <button
-                          onClick={() => onDeleteAppointment?.(item)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer text-xs"
-                          title="Hapus Data Pasien"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                            {item.status !== "SELESAI" && item.status !== "BATAL" && (
+                              <button
+                                onClick={() => onCancelAppointment?.(item)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 border border-transparent hover:border-amber-200 transition-colors cursor-pointer text-xs"
+                                title="Tandai Batal / Pasien Tidak Hadir"
+                              >
+                                <Ban className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+
+                            <button
+                              onClick={() => onDeleteAppointment?.(item)}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer text-xs"
+                              title="Hapus Data Pasien"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        );
+                      })()}
                     </td>
                   </tr>
                 );

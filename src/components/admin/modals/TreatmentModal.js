@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Stethoscope, X, FileText, Sparkles } from "lucide-react";
+import { Stethoscope, X, FileText, Sparkles, AlertCircle } from "lucide-react";
 import { MASTER_TREATMENTS } from "@/lib/analytics";
 
 export default function TreatmentModal({ open, appointment, onClose, onSuccess, setFeedback }) {
@@ -78,6 +78,8 @@ export default function TreatmentModal({ open, appointment, onClose, onSuccess, 
     }
   };
 
+  const isAllowed = appointment.status === "TERKONFIRMASI" || appointment.status === "SELESAI";
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-lg w-full overflow-hidden max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
@@ -95,7 +97,20 @@ export default function TreatmentModal({ open, appointment, onClose, onSuccess, 
           <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             <p className="font-semibold text-slate-800 text-sm">{appointment.nama}</p>
             <p className="text-slate-500 mt-0.5">Keluhan awal: &ldquo;{appointment.keluhan}&rdquo;</p>
+            <p className="text-[11px] text-slate-500 mt-1">Status saat ini: <strong className="text-slate-800">{appointment.status}</strong></p>
           </div>
+
+          {!isAllowed && (
+            <div className="bg-amber-50 p-3.5 rounded-xl border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">Pasien Belum Terkonfirmasi</p>
+                <p className="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
+                  Tindakan medis hanya dapat dicatat untuk pasien yang telah berstatus &quot;Terkonfirmasi&quot;. Silakan atur jadwal dan pastikan konfirmasi kehadiran pasien terlebih dahulu.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Preset Dropdown Tindakan Medis */}
           <div>
@@ -106,9 +121,10 @@ export default function TreatmentModal({ open, appointment, onClose, onSuccess, 
               </span>
             </label>
             <select
+              disabled={!isAllowed}
               value={selectedMaster}
               onChange={handleSelectMasterTreatment}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50/50"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50/50 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
             >
               <option value="">-- Pilih preset tindakan atau ketik manual di bawah --</option>
               {MASTER_TREATMENTS.map((m) => (
@@ -127,10 +143,11 @@ export default function TreatmentModal({ open, appointment, onClose, onSuccess, 
             <textarea
               rows={2}
               required
+              disabled={!isAllowed}
               placeholder="Contoh: Pembersihan karang gigi (scaling rahang atas & bawah), penambalan komposit gigi premolar."
               value={treatmentData.tindakan}
               onChange={(e) => setTreatmentData({ ...treatmentData, tindakan: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -142,10 +159,11 @@ export default function TreatmentModal({ open, appointment, onClose, onSuccess, 
             </label>
             <textarea
               rows={2}
+              disabled={!isAllowed}
               placeholder="Contoh: Hindari minum air dingin selama 24 jam. Resep: Amoxicillin 500mg 3x1, Asam Mefenamat 500mg bila nyeri. Jadwal kontrol 1 minggu lagi."
               value={treatmentData.catatanDokter}
               onChange={(e) => setTreatmentData({ ...treatmentData, catatanDokter: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -161,10 +179,11 @@ export default function TreatmentModal({ open, appointment, onClose, onSuccess, 
                 min="0"
                 step="1000"
                 required
+                disabled={!isAllowed}
                 placeholder="250000"
                 value={treatmentData.biaya}
                 onChange={(e) => setTreatmentData({ ...treatmentData, biaya: e.target.value })}
-                className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 text-slate-900 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 text-slate-900 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -179,8 +198,8 @@ export default function TreatmentModal({ open, appointment, onClose, onSuccess, 
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-semibold cursor-pointer shadow-xs disabled:opacity-50"
+              disabled={loading || !isAllowed}
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-semibold cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Menyimpan..." : "Selesaikan Kunjungan Pasien"}
             </button>

@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { getAdminSession } from '@/lib/auth';
 import { getClientIp } from '@/lib/rate-limiter';
 import { logSecurityEvent } from '@/lib/audit';
+import { sanitizeText } from '@/lib/sanitize';
 
 export async function PATCH(request, context) {
   try {
@@ -17,7 +18,35 @@ export async function PATCH(request, context) {
       return NextResponse.json({ error: 'ID tidak valid' }, { status: 400 });
     }
 
+    const existing = await prisma.appointment.findUnique({
+      where: { id: appointmentId },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Data jadwal tidak ditemukan.' }, { status: 404 });
+    }
+
     const body = await request.json();
+
+    // Validasi alur penanganan: Tindakan / Selesai hanya boleh untuk pasien yang sudah TERKONFIRMASI atau SELESAI
+    const isAttemptingTreatmentOrComplete =
+      body.status === 'SELESAI' ||
+      (body.tindakan !== undefined && String(body.tindakan).trim() !== '');
+
+    if (
+      isAttemptingTreatmentOrComplete &&
+      existing.status !== 'TERKONFIRMASI' &&
+      existing.status !== 'SELESAI'
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Tindakan medis hanya dapat diinput untuk pasien yang sudah berstatus 'Terkonfirmasi'. Silakan jadwalkan dan pastikan kehadiran pasien terkonfirmasi terlebih dahulu.",
+        },
+        { status: 400 }
+      );
+    }
+
     const updateData = {};
 
     if (body.tanggalJanji !== undefined) {
@@ -30,10 +59,10 @@ export async function PATCH(request, context) {
       updateData.status = body.status;
     }
     if (body.tindakan !== undefined) {
-      updateData.tindakan = body.tindakan;
+      updateData.tindakan = body.tindakan ? sanitizeText(body.tindakan) : null;
     }
     if (body.catatanDokter !== undefined) {
-      updateData.catatanDokter = body.catatanDokter;
+      updateData.catatanDokter = body.catatanDokter ? sanitizeText(body.catatanDokter) : null;
     }
     if (body.biaya !== undefined) {
       updateData.biaya = body.biaya !== null && body.biaya !== '' ? parseFloat(body.biaya) : null;
