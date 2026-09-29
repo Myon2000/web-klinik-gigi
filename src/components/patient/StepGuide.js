@@ -11,7 +11,7 @@ export default function StepGuide() {
           <CalendarCheck2 className="w-3.5 h-3.5 text-blue-600" /> Pelayanan Kesehatan Gigi Ramah & Profesional
         </span>
         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-          Buat Janji Konsultasi Gigi Tanpa Ribet
+          Buat Janji Konsultasi Gigi
         </h2>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
           Sampaikan keluhan gigi Anda melalui formulir di bawah ini. Admin kami akan menghubungi Anda via WhatsApp untuk memberikan kepastian jadwal pemeriksaan.

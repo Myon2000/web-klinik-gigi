@@ -21,7 +21,7 @@ export default function HeroSection() {
           <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 text-slate-200 border border-slate-700/70 backdrop-blur-md mb-6 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
             <span className="tracking-normal font-medium text-slate-200">
-              Praktik Dokter Gigi Terpercaya di Kaliwates, Jember
+              Praktik Dokter Gigi di Kaliwates, Jember
             </span>
           </div>
 
