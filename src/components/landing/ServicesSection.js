@@ -78,7 +78,7 @@ export default function ServicesSection() {
             <span>Layanan Praktik Medis</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Perawatan Gigi 
+            Layanan Perawatan Gigi
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
             Penanganan klinis terstandar dengan peralatan modern dan higienis untuk menjaga kesehatan serta estetika senyum Anda di Kaliwates, Jember.

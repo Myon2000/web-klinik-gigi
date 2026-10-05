@@ -59,12 +59,23 @@ export const metadata = {
     siteName: "Klinik drg. Hetty",
     locale: "id_ID",
     type: "website",
+    images: [
+      {
+        url: "https://images.pexels.com/photos/3845653/pexels-photo-3845653.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        width: 1200,
+        height: 630,
+        alt: "Klinik drg. Hetty Jember - Pelayanan Perawatan Gigi Profesional",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Klinik drg. Hetty Jember | Dokter Gigi Profesional",
     description:
       "Klinik dokter gigi di Kaliwates Jember. Scaling, tambal gigi, behel, dan cabut gigi. Buat janji online mudah.",
+    images: [
+      "https://images.pexels.com/photos/3845653/pexels-photo-3845653.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
   },
   robots: {
     index: true,
